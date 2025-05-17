@@ -18,9 +18,8 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
-        'email',
-        'password',
+        'name', 'email', 'password', 'role', 'headline', 
+        'summary', 'location', 'website_url', 'avatar_url'
     ];
 
     /**
@@ -41,4 +40,48 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    
+    // Relationships
+    public function company()
+    {
+        return $this->hasOne(Company::class);
+    }
+
+    public function jobs()
+    {
+        return $this->hasMany(Job::class, 'company_id');
+    }
+
+    public function applications()
+    {
+        return $this->hasMany(Application::class);
+    }
+
+    public function skills()
+    {
+        return $this->belongsToMany(Skill::class, 'user_skill')
+                   ->withPivot('proficiency_level');
+    }
+
+    public function educations()
+    {
+        return $this->hasMany(Education::class);
+    }
+
+    public function workExperiences()
+    {
+        return $this->hasMany(WorkExperience::class);
+    }
+
+    public function connections()
+    {
+        return $this->belongsToMany(User::class, 'connections', 'user_id', 'connected_user_id')
+                   ->withPivot('status', 'connected_at');
+    }
+
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
 }
