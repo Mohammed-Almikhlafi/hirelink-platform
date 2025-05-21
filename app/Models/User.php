@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -12,36 +14,22 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
-        'name', 'email', 'password', 'role', 'headline', 
-        'summary', 'location', 'website_url', 'avatar_url'
-    ];
-
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
-    protected $hidden = [
+        'name',
+        'email',
         'password',
-        'remember_token',
+        'specialization',
+        'role',
+        'headline',
+        'summary',
+        'location',
+        'website_url',
+        'avatar_url',
+        'job_category_id',    // ← أضف هذا
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
+    // ...
 
-    
     // Relationships
     public function company()
     {
@@ -61,7 +49,7 @@ class User extends Authenticatable
     public function skills()
     {
         return $this->belongsToMany(Skill::class, 'user_skill')
-                   ->withPivot('proficiency_level');
+            ->withPivot('proficiency_level');
     }
 
     public function educations()
@@ -76,12 +64,24 @@ class User extends Authenticatable
 
     public function connections()
     {
-        return $this->belongsToMany(User::class, 'connections', 'user_id', 'connected_user_id')
-                   ->withPivot('status', 'connected_at');
+        return $this->belongsToMany(
+            User::class,
+            'connections',
+            'user_id',
+            'connected_user_id'
+        )->withPivot('status', 'connected_at');
     }
 
     public function notifications()
     {
         return $this->hasMany(Notification::class);
+    }
+
+    /**
+     * العلاقة مع تصنيف الوظيفة
+     */
+    public function jobCategory()
+    {
+        return $this->belongsTo(JobCategory::class, 'job_category_id');
     }
 }

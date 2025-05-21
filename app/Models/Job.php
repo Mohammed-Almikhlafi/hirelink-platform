@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Job extends Model
 {
-    use SoftDeletes;
+    // use SoftDeletes;
 
     protected $fillable = [
         'company_id', 'job_category_id', 'title', 'description', 

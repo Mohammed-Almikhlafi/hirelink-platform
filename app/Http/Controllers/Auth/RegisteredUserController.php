@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Models\JobCategory;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
@@ -15,13 +16,15 @@ use Inertia\Inertia;
 use Inertia\Response;
 
 class RegisteredUserController extends Controller
-{
+{   
     /**
      * Display the registration view.
      */
     public function create(): Response
     {
-        return Inertia::render('Auth/Register');
+        return Inertia::render('Auth/Register', [
+            'categories' => JobCategory::all(),
+        ]);
     }
 
     /**
@@ -35,15 +38,24 @@ class RegisteredUserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'specialization' => 'required|string|max:255',
+            'job_category_id' => 'required|exists:job_categories,id', 
+
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'specialization' => $request->specialization,
+            'job_category_id' => $request->job_category_id,
+
+
         ]);
 
-        event(new Registered($user));
+        
+
+        // event(new Registered($user));
 
         Auth::login($user);
 

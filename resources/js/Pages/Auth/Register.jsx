@@ -6,12 +6,16 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import { Head, Link, useForm } from '@inertiajs/react';
 
-export default function Register() {
+export default function Register({ categories = [] }) {
     const { data, setData, post, processing, errors, reset } = useForm({
         name: '',
         email: '',
+        job_category_id: '', // added profession field
         password: '',
         password_confirmation: '',
+        specialization: '', 
+
+
     });
 
     useEffect(() => {
@@ -21,12 +25,14 @@ export default function Register() {
     }, []);
 
     const handleOnChange = (event) => {
-        setData(event.target.name, event.target.type === 'checkbox' ? event.target.checked : event.target.value);
+        setData(
+            event.target.name,
+            event.target.type === 'checkbox' ? event.target.checked : event.target.value
+        );
     };
 
     const submit = (e) => {
         e.preventDefault();
-
         post(route('register'));
     };
 
@@ -37,7 +43,6 @@ export default function Register() {
             <form onSubmit={submit}>
                 <div>
                     <InputLabel htmlFor="name" value="Name" />
-
                     <TextInput
                         id="name"
                         name="name"
@@ -48,13 +53,27 @@ export default function Register() {
                         onChange={handleOnChange}
                         required
                     />
-
                     <InputError message={errors.name} className="mt-2" />
                 </div>
 
+              <div className="mt-4">
+                    <InputLabel htmlFor="specialization" value="Specialization" />
+
+                    <TextInput
+                        id="specialization"
+                        name="specialization"
+                        value={data.specialization}
+                        className="mt-1 block w-full"
+                        onChange={handleOnChange}
+                        required
+                    />
+
+                    <InputError message={errors.specialization} className="mt-2" />
+                </div>
+
+
                 <div className="mt-4">
                     <InputLabel htmlFor="email" value="Email" />
-
                     <TextInput
                         id="email"
                         type="email"
@@ -65,13 +84,51 @@ export default function Register() {
                         onChange={handleOnChange}
                         required
                     />
-
                     <InputError message={errors.email} className="mt-2" />
+                </div>
+
+
+                            {/* <div className="mt-4">
+                <InputLabel htmlFor="specialization" value="Specialization" />
+
+                <TextInput
+                    id="specialization"
+                    name="specialization"
+                    value={data.specialization}
+                    className="mt-1 block w-full"
+                    onChange={handleOnChange}
+                />
+
+                <InputError message={errors.specialization} className="mt-2" />
+            </div> */}
+
+    
+
+
+
+                {/* Profession Selection */}
+                <div className="mt-4">
+                    <InputLabel htmlFor="job_category_id" value="Profession" />
+                    <select
+                        id="job_category_id"    
+                        name="job_category_id"
+                        value={data.job_category_id}
+                        onChange={handleOnChange}
+                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                        required
+                    >
+                        <option value="">Select your profession</option>
+                        {categories.map((cat) => (
+                            <option key={cat.id} value={cat.id}>
+                                {cat.name}
+                            </option>
+                        ))}
+                    </select>
+                    <InputError message={errors.job_category_id} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
                     <InputLabel htmlFor="password" value="Password" />
-
                     <TextInput
                         id="password"
                         type="password"
@@ -82,13 +139,11 @@ export default function Register() {
                         onChange={handleOnChange}
                         required
                     />
-
                     <InputError message={errors.password} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
                     <InputLabel htmlFor="password_confirmation" value="Confirm Password" />
-
                     <TextInput
                         id="password_confirmation"
                         type="password"
@@ -99,7 +154,6 @@ export default function Register() {
                         onChange={handleOnChange}
                         required
                     />
-
                     <InputError message={errors.password_confirmation} className="mt-2" />
                 </div>
 
