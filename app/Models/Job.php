@@ -31,7 +31,7 @@ class Job extends Model
         return $this->belongsTo(JobCategory::class, 'job_category_id');
     }
 
-    public function applications()
+    public function applications()      
     {
         return $this->hasMany(Application::class);
     }

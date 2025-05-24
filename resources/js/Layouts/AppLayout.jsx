@@ -5,18 +5,14 @@ import { usePage } from '@inertiajs/react';
 
 export default function AppLayout({ children }) {
   const { auth } = usePage().props;
-  
-  return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {auth.user ? (
-        <AuthenticatedLayout>
-          {children}
-        </AuthenticatedLayout>
-      ) : (
-        <GuestLayout>
-          {children}
-        </GuestLayout>
-      )}
-    </div>
+
+  return auth.user ? (
+    <AuthenticatedLayout user={auth.user}>
+      {children}
+    </AuthenticatedLayout>
+  ) : (
+    <GuestLayout user={auth.user}>
+      {children}
+    </GuestLayout>
   );
 }

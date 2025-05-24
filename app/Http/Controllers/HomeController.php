@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\Job;
 use App\Models\JobCategory;
 use Illuminate\Http\Request;
@@ -10,29 +11,33 @@ use Inertia\Inertia;
 class HomeController extends Controller
 {
     /**
-     * Display the application home page with jobs and categories.
+     * Display the application home page with jobs, categories, and users.
      *
      * @return \Inertia\Response
      */
     public function index(Request $request)
     {
-        // جلب جميع الوظائف مع بيانات الشركة المرتبطة، مرتبة حسب الإنشاء (الأحدث أولاً)
+        // جلب أحدث 6 مستخدمين مع الحقول المطلوبة
+        $users = User::select('id', 'name', 'specialization', 'avatar_url')
+            ->latest()
+            ->take(6)
+            ->get();
+
+        // جلب الوظائف مع بيانات الشركة
         $jobs = Job::with('company')
-            ->orderBy('created_at', 'desc') // بدل posted_at
+            ->orderBy('created_at', 'desc')
             ->get()
             ->map(function ($job) {
                 return [
-                    'id'         => $job->id,
-                    'title'      => $job->title,
-                    'location'   => $job->location,
-                    'posted_at'  => $job->created_at->toDateString(), // استخدم created_at كـ posted_at
-                    'company'    => [
-                        'name' => $job->company->name ?? null,
-                    ],
+                    'id'        => $job->id,
+                    'title'     => $job->title,
+                    'location'  => $job->location,
+                    'posted_at' => $job->created_at->toDateString(),
+                    'company'   => ['name' => $job->company->name ?? null],
                 ];
             });
 
-        // جلب الأقسام مع عدد الوظائف في كل قسم
+        // جلب الأقسام مع عدد الوظائف والمستخدمين المصرّفين في كل قسم
         $categories = JobCategory::with(['users'])->withCount('jobs')
             ->orderBy('name')
             ->get()
@@ -51,10 +56,11 @@ class HomeController extends Controller
                 ];
             });
 
-
-        return Inertia::render('Home', [
+        // عرض الصفحة مع تمرير البيانات للواجهة
+        return Inertia::render('Home', [ 
             'jobs'       => $jobs,
             'categories' => $categories,
+            'users'      => $users,
         ]);
     }
 }

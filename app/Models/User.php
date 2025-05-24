@@ -9,9 +9,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-
+use Spatie\Permission\Traits\HasRoles;
+use App\Models\Role;
 class User extends Authenticatable
 {
+    use HasRoles;
     use HasApiTokens, HasFactory, Notifiable;
 
     protected $fillable = [
@@ -25,7 +27,7 @@ class User extends Authenticatable
         'location',
         'website_url',
         'avatar_url',
-        'job_category_id',    // ← أضف هذا
+        'job_category_id',    
     ];
 
     // ...
@@ -83,5 +85,10 @@ class User extends Authenticatable
     public function jobCategory()
     {
         return $this->belongsTo(JobCategory::class, 'job_category_id');
+    }
+
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class);
     }
 }

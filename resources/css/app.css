@@ -1,3 +1,28 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+
+
+
+
+:root {
+    /* Light Theme */
+    --color-bg-main: #ffffff;
+    --color-bg-secondary: #f3f4f6;
+    --color-text-main: #1f2937;
+    --color-text-body: #4b5563;
+    --color-primary: #3b82f6;
+    --color-primary-hover: #2563eb;
+}
+
+.dark {
+    /* Dark Theme */
+    --color-bg-main: #111827;
+    --color-bg-secondary: #1f2937;
+    --color-text-main: #f3f4f6;
+    --color-text-body: #9ca3af;
+    --color-primary: #3b82f6;
+    --color-primary-hover: #2563eb;
+}
