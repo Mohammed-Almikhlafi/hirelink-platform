@@ -1,0 +1,95 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import 'custom.css';
+
+:root {
+    /* Light Theme - Professional colors with better contrast */
+    --color-bg-main: #ffffff;
+    --color-bg-secondary: #f8fafc;
+    --color-text-main: #0f172a;
+    --color-text-body: #334155;
+    --color-primary: #2563eb;
+    --color-primary-hover: #1d4ed8;
+    --color-accent: #7c3aed;
+    --color-accent-hover: #6d28d9;
+    --color-border: #e2e8f0;
+    --color-success: #059669;
+    --color-error: #dc2626;
+}
+
+.dark {
+    /* Dark Theme - Rich dark mode with better visibility */
+    --color-bg-main: #0f172a;
+    --color-bg-secondary: #1e293b;
+    --color-text-main: #f8fafc;
+    --color-text-body: #cbd5e1;
+    --color-primary: #3b82f6;
+    --color-primary-hover: #2563eb;
+    --color-accent: #8b5cf6;
+    --color-accent-hover: #7c3aed;
+    --color-border: #334155;
+    --color-success: #10b981;
+    --color-error: #ef4444;
+}
+
+/* Base styles */
+@layer base {
+    body {
+        @apply antialiased text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-900;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        @apply text-slate-900 dark:text-white font-bold;
+    }
+}
+
+/* Component styles */
+@layer components {
+    .btn-primary {
+        @apply px-4 py-2 bg-primary text-white rounded-lg 
+               hover:bg-primary-hover transition-colors duration-200
+               focus:outline-none focus:ring-2 focus:ring-primary-200 focus:ring-offset-2
+               font-semibold shadow-sm;
+    }
+
+    .btn-secondary {
+        @apply px-4 py-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-white rounded-lg
+               border border-slate-200 dark:border-slate-700
+               hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors duration-200
+               focus:outline-none focus:ring-2 focus:ring-primary-200 focus:ring-offset-2
+               font-semibold shadow-sm;
+    }
+
+    .card {
+        @apply bg-white dark:bg-slate-800 rounded-xl shadow-sm 
+               border border-slate-200 dark:border-slate-700/50
+               hover:shadow-md transition-all duration-200;
+    }
+
+    .input {
+        @apply w-full px-4 py-2 rounded-lg 
+               border border-slate-200 dark:border-slate-700
+               bg-white dark:bg-slate-800 
+               text-slate-900 dark:text-white
+               placeholder:text-slate-500 dark:placeholder:text-slate-400
+               focus:outline-none focus:ring-2 focus:ring-primary-200 dark:focus:ring-primary-300
+               focus:border-transparent shadow-sm;
+    }
+
+    .section-title {
+        @apply text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white mb-6;
+    }
+
+    .section-subtitle {
+        @apply text-lg text-slate-600 dark:text-slate-400 mb-8 max-w-2xl;
+    }
+}
+
+/* Utility classes */
+@layer utilities {
+    .text-balance {
+        text-wrap: balance;
+    }
+}
