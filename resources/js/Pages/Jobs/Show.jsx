@@ -1,73 +1,70 @@
 import React from 'react';
-import { Head, Link } from '@inertiajs/react';
-import { Briefcase, MapPin, CalendarDays } from 'lucide-react';
+import { Head } from '@inertiajs/react';
+import AppLayout from '@/Layouts/AppLayout';
+import { Building2, MapPin, Calendar } from 'lucide-react';
+import { Link } from '@inertiajs/react';
+import MainLayout from '@/Layouts/MainLayout';
 
-export default function JobShow({ job }) {
-  const company = job.company || {};
-
+export default function Show({ job }) {
   return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-10 px-4">
-          <Head title={job.title} />
+    <MainLayout title={job.title}>
+      <Head title={job.title} />
 
-          <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 shadow-lg rounded-2xl p-8 space-y-6">
-              {/* Header */}
-              <div className="space-y-2">
-                  <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                      {job.title}
-                  </h1>
-                  <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 space-x-4">
-                      {company.name && (
-                          <div className="flex items-center space-x-1">
-                              <Briefcase className="w-4 h-4" />
-                              <span>{company.name}</span>
-                          </div>
-                      )}
-                      {job.location && (
-                          <div className="flex items-center space-x-1">
-                              <MapPin className="w-4 h-4" />
-                              <span>{job.location}</span>
-                          </div>
-                      )}
-                      {job.posted_at && (
-                          <div className="flex items-center space-x-1">
-                              <CalendarDays className="w-4 h-4" />
-                              <span>{job.posted_at}</span>
-                          </div>
-                      )}
-                  </div>
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="bg-white dark:bg-slate-800 rounded-xl p-6 md:p-8 border border-slate-200 dark:border-slate-700/50">
+          {/* Header */}
+          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-8">
+            <div>
+              <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
+                {job.title}
+              </h1>
+              <div className="flex flex-wrap gap-4 text-sm text-slate-600 dark:text-slate-400">
+                <div className="flex items-center gap-1">
+                  <Building2 className="w-4 h-4" />
+                  <span>{job.company.name}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <MapPin className="w-4 h-4" />
+                  <span>{job.location}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Calendar className="w-4 h-4" />
+                  <span>Posted {new Date(job.created_at).toLocaleDateString()}</span>
+                </div>
               </div>
+            </div>
 
-              {/* Description */}
-              <div className="prose dark:prose-invert max-w-none">
-                  <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
-                      Job Description
-                  </h2>
-                  <p>{job.description || "No description provided."}</p>
-              </div>
-
-              {/* Buttons */}
-              <div className="pt-6 flex justify-between items-center">
-                  <Link
-                      href="/"
-                      className="inline-block text-indigo-600 hover:text-indigo-800 font-medium"
-                  >
-                      &larr; Back to Home
-                  </Link>{" "}
-                  <a
-                      href={`/apply/${job.id}`}
-                      className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition"
-                  >
-                      Apply Now
-                  </a>
-              </div>
+            {/* Apply Button */}
+            <Link
+              href={route('jobs.apply', job.id)}
+              className="btn-primary whitespace-nowrap"
+            >
+              Apply Now
+            </Link>
           </div>
-          <div className="flex justify-end">
-              <Link href="/jobs/create" className="btn">
-                  Create New Job
-              </Link>
+
+          {/* Description */}
+          <div className="prose dark:prose-invert max-w-none">
+            <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
+              Job Description
+            </h2>
+            <div className="whitespace-pre-wrap text-slate-600 dark:text-slate-400">
+              {job.description}
+            </div>
           </div>
+
+          {/* Company Info */}
+          <div className="mt-8 pt-8 border-t border-slate-200 dark:border-slate-700/50">
+            <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
+              About {job.company.name}
+            </h2>
+            <p className="text-slate-600 dark:text-slate-400">
+              {job.company.description || 'No company description available.'}
+            </p>
+          </div>
+        </div>
       </div>
+    </MainLayout>
   );
-
 }
 

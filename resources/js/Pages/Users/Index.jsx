@@ -1,10 +1,12 @@
 // resources/js/Pages/Users/Index.jsx
 import React from "react";
 import { Head, Link, usePage } from "@inertiajs/react";
+import Applayout from "@/Layouts/Applayout";
 
 export default function UsersIndex({ users }) {
     return (
-        <div className="p-8">
+        <Applayout>
+            <div className="p-8">
             <Head title="Users" />
             <h1 className="text-3xl font-bold mb-6">Users</h1>
             <table className="w-full bg-white shadow rounded-lg">
@@ -37,5 +39,6 @@ export default function UsersIndex({ users }) {
                 </tbody>
             </table>
         </div>
+        </Applayout>
     );
 }

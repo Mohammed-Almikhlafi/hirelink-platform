@@ -13,9 +13,11 @@ class JobController extends Controller
     public function index()
     {
         $jobs = Job::with('company')->latest()->get();
+        $categories = JobCategory::select('id', 'name')->get();
 
         return Inertia::render('Jobs/Index', [
             'jobs' => $jobs,
+            'categories' => $categories,
         ]);
     }
 

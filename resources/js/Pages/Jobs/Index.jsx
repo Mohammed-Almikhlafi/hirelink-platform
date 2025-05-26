@@ -1,36 +1,50 @@
-// resources/js/Pages/Jobs/CreateSuccess.jsx
-import React from "react";
-import { Head, Link } from "@inertiajs/react";
-import { CheckCircle } from "lucide-react";
+import React from 'react';
+import { Head } from '@inertiajs/react';
+import MainLayout from '@/Layouts/MainLayout';
+import JobCard from '@/Components/JobCard';
+import JobFilters from '@/Components/JobFilters';
 
-export default function CreateSuccess() {
+const Index = ({ jobs = { data: [] }, filters = {}, categories = [] }) => {
     return (
-        <div className="min-h-screen flex flex-col bg-gradient-to-r from-indigo-50 to-white dark:from-gray-900 dark:to-gray-800 p-8">
-            <Head title="Job Created" />
+        <MainLayout>
+            <Head title="Jobs" />
 
-            <div className="max-w-3xl mx-auto bg-white dark:bg-gray-900 rounded-3xl shadow-xl p-10 text-center space-y-6">
-                <CheckCircle className="w-16 h-16 text-green-500 mx-auto" />
-                <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white">
-                    Job Created Successfully!
-                </h1>
-                <p className="text-gray-600 dark:text-gray-400">
-                    Your job has been posted and is now live.
-                </p>
-                <div className="flex justify-center space-x-4 pt-6">
-                    <Link
-                        href="/"
-                        className="px-6 py-3 bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-600 transition"
-                    >
-                        ← Back to Home
-                    </Link>
-                    <Link
-                        href="/jobs/create"
-                        className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition"
-                    >
-                        + Add Another Job
-                    </Link>
+            <div className="py-12">
+                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                    <div className="bg-white dark:bg-slate-800 overflow-hidden shadow-xl sm:rounded-lg">
+                        <div className="p-6">
+                            <h1 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6">
+                                Available Jobs
+                            </h1>
+                            
+                            <JobFilters 
+                                filters={filters} 
+                                categories={categories} 
+                            />
+
+                            <div className="mt-6 space-y-6">
+                                {jobs.data.length > 0 ? (
+                                    jobs.data.map(job => (
+                                        <JobCard key={job.id} job={job} />
+                                    ))
+                                ) : (
+                                    <p className="text-gray-500 dark:text-gray-400 text-center py-8">
+                                        No jobs found matching your criteria.
+                                    </p>
+                                )}
+                            </div>
+
+                            {jobs.links && (
+                                <div className="mt-6">
+                                    {/* Add pagination component here if needed */}
+                                </div>
+                            )}
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
+        </MainLayout>
     );
-}
+};
+
+export default Index; 

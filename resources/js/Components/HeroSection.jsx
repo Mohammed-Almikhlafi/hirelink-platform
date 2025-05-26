@@ -1,31 +1,87 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Link } from '@inertiajs/react';
+import { Search, Filter, X, MapPin, Building2 } from 'lucide-react';
 
-export default function HeroSection() {
+export default function HeroSection({ categories = [] }) {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
+
   return (
-    <section className="bg-gradient-to-br from-indigo-600 to-purple-600 text-white py-16 md:py-24">
-      <div className="max-w-7xl mx-auto px-4 lg:flex lg:items-center lg:justify-between gap-12">
-        <div className="lg:w-1/2 text-center lg:text-left">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
-            Find Your <span className="text-purple-200">Perfect Job</span>
-          </h2>
-          <p className="text-lg md:text-xl mb-8 opacity-90">
-            Start your career journey with thousands of opportunities across various fields
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 max-w-xl mx-auto lg:mx-0">
+    <div className="bg-white dark:bg-slate-800">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Search and Filter Bar */}
+        <div className="flex flex-col lg:flex-row gap-4 mb-8">
+          {/* Search Input */}
+          <div className="flex-1 relative">
+            <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+              <Search className="w-5 h-5 text-slate-400" />
+            </div>
             <input
               type="text"
-              placeholder="Job title or keywords"
-              className="flex-grow px-6 py-3 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-transform duration-300 hover:scale-105"
+              placeholder="Search by job title, company, or description..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="input pl-10"
             />
-            <button className="px-8 py-3 bg-white text-indigo-600 font-semibold rounded-lg hover:bg-gray-50 transition-transform duration-300 hover:scale-105 shadow-sm">
-              Search
-            </button>
           </div>
+
+          {/* Filter Button */}
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="btn-secondary inline-flex items-center gap-2"
+          >
+            <Filter className="w-5 h-5" />
+            Filters
+            {selectedCategory && (
+              <span className="w-2 h-2 rounded-full bg-primary" />
+            )}
+          </button>
         </div>
-        <div className="lg:w-1/2 hidden lg:block">
-          <img src="/images/hero-illustration.svg" alt="Job Search" className="w-full max-w-xl mx-auto" />
+
+        {/* Filters Panel */}
+        {showFilters && (
+          <div className="bg-white dark:bg-slate-800 rounded-xl p-6 mb-8 border border-slate-200 dark:border-slate-700/50">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                Category
+              </label>
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="input"
+              >
+                <option value="">All Categories</option>
+                {categories.map(category => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Clear Filters */}
+            {selectedCategory && (
+              <div className="mt-4 flex justify-end">
+                <button
+                  onClick={() => setSelectedCategory('')}
+                  className="inline-flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-primary"
+                >
+                  <X className="w-4 h-4" />
+                  Clear Filters
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Results Count */}
+        <div className="mb-6">
+          <p className="text-sm text-slate-600 dark:text-slate-400">
+            Start your search above to find opportunities
+          </p>
         </div>
       </div>
-    </section>
+    </div>
   );
 }

@@ -1,69 +1,51 @@
 import React from 'react';
-import { Head, Link } from '@inertiajs/react';
-import { User, Briefcase } from 'lucide-react';
+import { Head } from '@inertiajs/react';
+import MainLayout from '@/Layouts/MainLayout';
+import JobCard from '@/Components/JobCard';
 
-export default function CategoryShow({ category }) {
-  return (
-    <div className="min-h-screen bg-gradient-to-r from-indigo-50 to-white dark:from-gray-900 dark:to-gray-800 p-8">
-      <Head title={category.name} />
+const Show = ({ category }) => {
+    return (
+        <MainLayout>
+            <Head title={category.name} />
 
-      <div className="max-w-6xl mx-auto bg-white dark:bg-gray-900 rounded-3xl shadow-xl p-10">
-        {/* عنوان التصنيف */}
-        <h1 className="text-5xl font-extrabold text-indigo-700 mb-6 drop-shadow-lg">
-          {category.name}
-        </h1>
+            <div className="py-12">
+                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                    <div className="bg-white dark:bg-slate-800 overflow-hidden shadow-xl sm:rounded-lg">
+                        <div className="p-6">
+                            <div className="mb-8">
+                                <h1 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
+                                    {category.name}
+                                </h1>
+                                {category.description && (
+                                    <p className="text-gray-600 dark:text-gray-400">
+                                        {category.description}
+                                    </p>
+                                )}
+                            </div>
 
-        {/* الوصف */}
-        <p className="text-lg text-gray-700 dark:text-gray-300 mb-10 leading-relaxed">
-          {category.description || 'No description available.'}
-        </p>
+                            <div className="border-t border-gray-200 dark:border-slate-700 pt-8">
+                                <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
+                                    Jobs in this Category
+                                </h2>
 
-        {/* عنوان المستخدمين */}
-        <h2 className="text-3xl font-semibold text-gray-800 dark:text-gray-200 mb-8 border-b border-indigo-300 pb-2">
-          Users in this category
-        </h2>
-
-        {category.users.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {category.users.map(user => (
-              <div
-                key={user.id}
-                className="bg-indigo-100/50 dark:bg-indigo-800/40 p-5 rounded-xl shadow-sm transition-transform hover:scale-[1.02] flex flex-col justify-between"
-              >
-                <div className="flex items-center mb-3">
-                  <User className="w-6 h-6 text-indigo-600 mr-3" />
-                  <h3 className="text-lg font-semibold text-indigo-800 dark:text-indigo-200 truncate">
-                    {user.name}
-                  </h3>
+                                <div className="space-y-6">
+                                    {category.jobs.length > 0 ? (
+                                        category.jobs.map(job => (
+                                            <JobCard key={job.id} job={job} />
+                                        ))
+                                    ) : (
+                                        <p className="text-gray-500 dark:text-gray-400 text-center py-8">
+                                            No jobs found in this category.
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+            </div>
+        </MainLayout>
+    );
+};
 
-                <div className="flex items-center space-x-2 text-indigo-700 dark:text-indigo-300 mb-4">
-                  <Briefcase className="w-4 h-4" />
-                  <p className="text-sm italic truncate">{user.specialization}</p>
-                </div>
-
-                <Link
-                  href={`/users/${user.id}`}
-                  className="self-start px-4 py-1.5 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition text-sm"
-                >
-                  View Profile
-                </Link>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-gray-600 dark:text-gray-400 italic">No users registered in this category yet.</p>
-        )}
-
-        <div className="mt-12 text-center">
-          <Link
-            href="/"
-            className="inline-block text-indigo-600 hover:text-indigo-800 font-medium"
-          >
-            &larr; Back to Home
-          </Link>
-        </div>
-      </div>
-    </div>
-  );
-}
+export default Show;

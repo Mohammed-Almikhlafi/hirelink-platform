@@ -1,9 +1,6 @@
 import './bootstrap';
 
-// 1️⃣ ثيم الألوان والمتغيرات لازم فوق
-import '../css/theme.css';
 
-// 2️⃣ ثم ملف Tailwind
 import '../css/app.css';
 
 import { createRoot } from 'react-dom/client';
