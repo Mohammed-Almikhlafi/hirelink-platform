@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\User;
@@ -13,72 +14,91 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
-        $user = $request->user();
-        $stats = [];
+        $user           = $request->user();
+        $stats          = [];
         $recentActivity = [];
-        $applications = [];
+        $applications   = [];
 
-        // Admin Stats
+        // --------------------
+        // Admin
+        // --------------------
         if ($user->role === 'admin') {
             $stats = [
-                'totalUsers' => User::count(),
-                'activeJobs' => Job::where('status', 'open')->count(),
-                'companies' => Company::count(),
+                'totalUsers'        => User::count(),
+                'activeJobs'        => Job::where('status', 'open')->count(),
+                'companies'         => Company::count(),
                 'totalApplications' => Application::count(),
             ];
 
             $recentActivity = $this->getAdminActivity();
         }
 
-        // Employer Stats
+        // --------------------
+        // Employer
+        // --------------------
         if ($user->role === 'employer') {
             $stats = [
-                'activeJobs' => Job::where('company_id', $user->company_id)
-                    ->where('status', 'open')
-                    ->count(),
-                'receivedApplications' => Application::whereHas('job', function ($query) use ($user) {
-                    $query->where('company_id', $user->company_id);
-                })->count(),
-                'shortlisted' => Application::whereHas('job', function ($query) use ($user) {
-                    $query->where('company_id', $user->company_id);
-                })->where('status', 'shortlisted')->count(),
-                'pendingReview' => Application::whereHas('job', function ($query) use ($user) {
-                    $query->where('company_id', $user->company_id);
-                })->where('status', 'pending')->count(),
+                'activeJobs'           => Job::where('company_id', $user->company_id)
+                                               ->where('status', 'open')
+                                               ->count(),
+
+                'receivedApplications' => Application::whereHas('job', function ($q) use ($user) {
+                                               $q->where('company_id', $user->company_id);
+                                           })
+                                           ->count(),
+
+                'shortlisted'          => Application::whereHas('job', function ($q) use ($user) {
+                                               $q->where('company_id', $user->company_id);
+                                           })
+                                           ->where('application_status', 'shortlisted')
+                                           ->count(),
+
+                'pendingReview'        => Application::whereHas('job', function ($q) use ($user) {
+                                               $q->where('company_id', $user->company_id);
+                                           })
+                                           ->where('application_status', 'pending')
+                                           ->count(),
             ];
 
-            $applications = Application::with(['user', 'job'])
-                ->whereHas('job', function ($query) use ($user) {
-                    $query->where('company_id', $user->company_id);
+            $applications = Application::with(['user','job'])
+                ->whereHas('job', function ($q) use ($user) {
+                    $q->where('company_id', $user->company_id);
                 })
                 ->latest()
                 ->take(5)
                 ->get()
-                ->map(function ($application) {
+                ->map(function ($app) {
                     return [
-                        'jobTitle' => $application->job->title,
-                        'company' => $application->job->company->name,
-                        'date' => $application->created_at->diffForHumans(),
-                        'status' => $application->status,
+                        'jobTitle' => $app->job->title,
+                        'company'  => $app->job->company->name,
+                        'date' => $app->created_at ? $app->created_at->diffForHumans() : 'N/A',
+                        'status'   => $app->application_status,
+                        'jobId'    => $app->job->id,
+                        'id'       => $app->id,
                     ];
                 });
 
             $recentActivity = $this->getEmployerActivity($user);
         }
 
-        // Job Seeker Stats
-        if ($user->role === 'professional') {
+        // --------------------
+        // Job Seeker
+        // --------------------
+        if ($user->role === 'job_seeker') {
             $stats = [
                 'applications' => Application::where('user_id', $user->id)->count(),
-                'shortlisted' => Application::where('user_id', $user->id)
-                    ->where('status', 'shortlisted')
-                    ->count(),
-                'rejected' => Application::where('user_id', $user->id)
-                    ->where('status', 'rejected')
-                    ->count(),
-                'pending' => Application::where('user_id', $user->id)
-                    ->where('status', 'pending')
-                    ->count(),
+
+                'shortlisted'  => Application::where('user_id', $user->id)
+                                             ->where('application_status', 'shortlisted')
+                                             ->count(),
+
+                'rejected'     => Application::where('user_id', $user->id)
+                                             ->where('application_status', 'rejected')
+                                             ->count(),
+
+                'pending'      => Application::where('user_id', $user->id)
+                                             ->where('application_status', 'pending')
+                                             ->count(),
             ];
 
             $applications = Application::with('job.company')
@@ -86,12 +106,12 @@ class DashboardController extends Controller
                 ->latest()
                 ->take(5)
                 ->get()
-                ->map(function ($application) {
+                ->map(function ($app) {
                     return [
-                        'jobTitle' => $application->job->title,
-                        'company' => $application->job->company->name,
-                        'date' => $application->created_at->diffForHumans(),
-                        'status' => $application->status,
+                        'jobTitle' => $app->job->title,
+                        'company'  => $app->job->company->name,
+                        'date' => $app->created_at ? $app->created_at->diffForHumans() : 'N/A',
+                        'status'   => $app->application_status,
                     ];
                 });
 
@@ -99,49 +119,58 @@ class DashboardController extends Controller
         }
 
         return Inertia::render('Dashboard', [
-            'stats' => $stats,
-            'recentActivity' => $recentActivity,
-            'applications' => $applications,
+            'auth'            => ['user' => $user],
+            'stats'           => $stats,
+            'recentActivity'  => $recentActivity,
+            'applications'    => $applications,
         ]);
     }
 
     private function getAdminActivity()
     {
         return Activity::with('user')
-            ->whereIn('type', ['user_registration', 'job_posted', 'company_registered'])
+            ->whereIn('type', [
+                'user_registration',
+                'job_posted',
+                'company_registered',
+            ])
             ->latest()
             ->take(5)
             ->get()
-            ->map(function ($activity) {
+            ->map(function ($act) {
                 return [
-                    'title' => $activity->title,
-                    'description' => $activity->description,
-                    'time' => $activity->created_at->diffForHumans(),
+                    'title'       => $act->title,
+                    'description' => $act->description,
+                    'time'        => $act->created_at->diffForHumans(),
                 ];
             });
     }
 
     private function getEmployerActivity($user)
     {
-        return Activity::with(['user', 'subject'])
-            ->where(function ($query) use ($user) {
-                $query->whereHasMorph('subject', [Job::class], function ($query) use ($user) {
-                    $query->where('company_id', $user->company_id);
-                })->orWhereHasMorph('subject', [Application::class], function ($query) use ($user) {
-                    $query->whereHas('job', function ($query) use ($user) {
-                        $query->where('company_id', $user->company_id);
+        return Activity::with(['user','subject'])
+            ->where(function ($q) use ($user) {
+                $q->whereHasMorph('subject', [Job::class], function ($q) use ($user) {
+                    $q->where('company_id', $user->company_id);
+                })
+                ->orWhereHasMorph('subject', [Application::class], function ($q) use ($user) {
+                    $q->whereHas('job', function ($q) use ($user) {
+                        $q->where('company_id', $user->company_id);
                     });
                 });
             })
-            ->whereIn('type', ['job_application', 'application_status_updated'])
+            ->whereIn('type', [
+                'job_application',
+                'application_status_updated',
+            ])
             ->latest()
             ->take(5)
             ->get()
-            ->map(function ($activity) {
+            ->map(function ($act) {
                 return [
-                    'title' => $activity->title,
-                    'description' => $activity->description,
-                    'time' => $activity->created_at->diffForHumans(),
+                    'title'       => $act->title,
+                    'description' => $act->description,
+                    'time'        => $act->created_at->diffForHumans(),
                 ];
             });
     }
@@ -149,22 +178,26 @@ class DashboardController extends Controller
     private function getJobSeekerActivity($user)
     {
         return Activity::with('subject')
-            ->where(function ($query) use ($user) {
-                $query->where('user_id', $user->id)
-                    ->orWhereHasMorph('subject', [Application::class], function ($query) use ($user) {
-                        $query->where('user_id', $user->id);
-                    });
+            ->where(function ($q) use ($user) {
+                $q->where('user_id', $user->id)
+                  ->orWhereHasMorph('subject', [Application::class], function ($q) use ($user) {
+                      $q->where('user_id', $user->id);
+                  });
             })
-            ->whereIn('type', ['application_submitted', 'application_status_updated', 'profile_viewed'])
+            ->whereIn('type', [
+                'job_application',
+                'application_status_updated',
+                'profile_viewed',
+            ])
             ->latest()
             ->take(5)
             ->get()
-            ->map(function ($activity) {
+            ->map(function ($act) {
                 return [
-                    'title' => $activity->title,
-                    'description' => $activity->description,
-                    'time' => $activity->created_at->diffForHumans(),
+                    'title'       => $act->title,
+                    'description' => $act->description,
+                    'time'        => $act->created_at->diffForHumans(),
                 ];
             });
     }
-} 
+}

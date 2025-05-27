@@ -1,4 +1,3 @@
-// resources/js/Pages/Jobs/Create.jsx
 import React from 'react';
 import { Head, useForm } from '@inertiajs/react';
 import InputError from '@/Components/InputError';
@@ -8,35 +7,31 @@ import TextArea from '@/Components/TextArea';
 import MainLayout from '@/Layouts/MainLayout';
 import Select from '@/Components/Select';
 
-export default function Create({ categories, jobTypes }) {
-    const { data, setData, post, processing, errors } = useForm({
-        title: '',
-        description: '',
-        location: '',
-        job_category_id: '',
-        job_type: '',
-        salary_range: '',
-        application_deadline: '',
+export default function Edit({ job, categories, jobTypes }) {
+    const { data, setData, put, processing, errors } = useForm({
+        title: job.title,
+        description: job.description,
+        location: job.location,
+        job_category_id: job.job_category_id,
+        job_type: job.job_type,
+        salary_range: job.salary_range,
+        application_deadline: job.application_deadline.split('T')[0],
+        status: job.status,
     });
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        post(route('employer.jobs.store'), {
-            onSuccess: () => {
-                // Flash message will be handled by the layout
-                window.location = route('employer.jobs.index');
-            },
-        });
+        put(route('jobs.update', job.id));
     };
 
     return (
-        <MainLayout title="Post a New Job">
-            <Head title="Post a New Job" />
+        <MainLayout title="Edit Job">
+            <Head title="Edit Job" />
 
             <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 <div className="bg-white dark:bg-slate-800 rounded-xl p-6 md:p-8 border border-slate-200 dark:border-slate-700/50">
                     <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-8">
-                        Post a New Job
+                        Edit Job
                     </h1>
 
                     <form onSubmit={handleSubmit} className="space-y-6">
@@ -138,6 +133,22 @@ export default function Create({ categories, jobTypes }) {
                             <InputError message={errors.application_deadline} className="mt-2" />
                         </div>
 
+                        {/* Job Status */}
+                        <div>
+                            <InputLabel htmlFor="status" value="Job Status" />
+                            <Select
+                                id="status"
+                                value={data.status}
+                                onChange={(e) => setData('status', e.target.value)}
+                                className="mt-1 block w-full"
+                                required
+                            >
+                                <option value="open">Open</option>
+                                <option value="closed">Closed</option>
+                            </Select>
+                            <InputError message={errors.status} className="mt-2" />
+                        </div>
+
                         {/* Description */}
                         <div>
                             <InputLabel htmlFor="description" value="Job Description" />
@@ -153,13 +164,20 @@ export default function Create({ categories, jobTypes }) {
                         </div>
 
                         {/* Submit Button */}
-                        <div className="flex items-center justify-end">
+                        <div className="flex items-center justify-end gap-4">
+                            <button
+                                type="button"
+                                onClick={() => window.history.back()}
+                                className="btn-secondary"
+                            >
+                                Cancel
+                            </button>
                             <button
                                 type="submit"
                                 className="btn-primary"
                                 disabled={processing}
                             >
-                                {processing ? 'Posting...' : 'Post Job'}
+                                {processing ? 'Saving...' : 'Save Changes'}
                             </button>
                         </div>
                     </form>
@@ -167,4 +185,4 @@ export default function Create({ categories, jobTypes }) {
             </div>
         </MainLayout>
     );
-}
+} 

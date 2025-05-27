@@ -155,7 +155,7 @@ export default function Dashboard({ auth, stats = {}, recentActivity = [], appli
                 <>
                   <QuickAction
                     title="Post Job"
-                    href={route('jobs.create')}
+                    href={route('employer.jobs.create')}
                     icon={Plus}
                   />
                   <QuickAction
