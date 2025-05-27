@@ -20,13 +20,13 @@ class EmployerJobController extends Controller
      */
     public function index()
     {
-        $jobs = Job::with(['category', 'applications'])
-            ->where('company_id', auth()->user()->company_id)
-            ->latest()
+        $jobs = auth()->user()->company->jobs()
+            ->withCount('applications')
+            ->orderBy('created_at', 'desc')
             ->paginate(10);
 
         return Inertia::render('Employer/Jobs/Index', [
-            'jobs' => $jobs
+            'jobs' => $jobs,
         ]);
     }
 
@@ -35,10 +35,9 @@ class EmployerJobController extends Controller
      */
     public function create()
     {
-        $categories = JobCategory::all();
-
         return Inertia::render('Employer/Jobs/Create', [
-            'categories' => $categories
+            'categories' => JobCategory::all(),
+            'jobTypes' => ['full-time', 'part-time', 'contract', 'internship'],
         ]);
     }
 
@@ -50,24 +49,18 @@ class EmployerJobController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
-            'category_id' => 'required|exists:job_categories,id',
-            'type' => 'required|in:full-time,part-time,contract,freelance',
             'location' => 'required|string|max:255',
+            'job_category_id' => 'required|exists:job_categories,id',
+            'job_type' => 'required|in:full-time,part-time,contract,internship',
             'salary_range' => 'required|string|max:255',
-            'requirements' => 'required|string',
-            'responsibilities' => 'required|string',
-            'deadline' => 'required|date|after:today',
+            'application_deadline' => 'required|date|after:today',
         ]);
 
-        $job = Job::create([
-            ...$validated,
-            'company_id' => auth()->user()->company_id,
+        $job = auth()->user()->company->jobs()->create($validated + [
             'status' => 'open',
         ]);
 
-        $job->recordJobPosted($job);
-
-        return redirect()->route('employer.jobs.index')
+        return redirect()->route('employer.jobs.show', $job)
             ->with('success', 'Job posted successfully.');
     }
 
@@ -78,10 +71,8 @@ class EmployerJobController extends Controller
     {
         $this->authorize('view', $job);
 
-        $job->load(['category', 'applications.user', 'company']);
-
         return Inertia::render('Employer/Jobs/Show', [
-            'job' => $job
+            'job' => $job->load(['company', 'category'])->loadCount('applications'),
         ]);
     }
 
@@ -92,11 +83,10 @@ class EmployerJobController extends Controller
     {
         $this->authorize('update', $job);
 
-        $categories = JobCategory::all();
-
         return Inertia::render('Employer/Jobs/Edit', [
-            'job' => $job,
-            'categories' => $categories
+            'job' => $job->load(['company', 'category']),
+            'categories' => JobCategory::all(),
+            'jobTypes' => ['full-time', 'part-time', 'contract', 'internship'],
         ]);
     }
 
@@ -110,20 +100,17 @@ class EmployerJobController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
-            'category_id' => 'required|exists:job_categories,id',
-            'type' => 'required|in:full-time,part-time,contract,freelance',
             'location' => 'required|string|max:255',
+            'job_category_id' => 'required|exists:job_categories,id',
+            'job_type' => 'required|in:full-time,part-time,contract,internship',
             'salary_range' => 'required|string|max:255',
-            'requirements' => 'required|string',
-            'responsibilities' => 'required|string',
-            'deadline' => 'required|date|after:today',
-            'status' => 'required|in:open,closed,draft',
+            'application_deadline' => 'required|date',
+            'status' => 'required|in:open,closed',
         ]);
 
         $job->update($validated);
 
-        return redirect()->route('employer.jobs.show', $job)
-            ->with('success', 'Job updated successfully.');
+        return back()->with('success', 'Job updated successfully.');
     }
 
     /**
@@ -137,39 +124,5 @@ class EmployerJobController extends Controller
 
         return redirect()->route('employer.jobs.index')
             ->with('success', 'Job deleted successfully.');
-    }
-
-    /**
-     * Display job applications.
-     */
-    public function applications(Job $job)
-    {
-        $this->authorize('view', $job);
-
-        $applications = $job->applications()
-            ->with('user.profile')
-            ->latest()
-            ->paginate(10);
-
-        return Inertia::render('Employer/Jobs/Applications', [
-            'job' => $job,
-            'applications' => $applications
-        ]);
-    }
-
-    /**
-     * Update application status.
-     */
-    public function updateApplicationStatus(Request $request, Job $job, Application $application)
-    {
-        $this->authorize('update', $job);
-
-        $validated = $request->validate([
-            'status' => 'required|in:pending,shortlisted,rejected,accepted'
-        ]);
-
-        $application->update($validated);
-
-        return back()->with('success', 'Application status updated successfully.');
     }
 } 

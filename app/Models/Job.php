@@ -5,9 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Job extends Model
 {
+    use HasFactory;
     // use SoftDeletes;
 
     protected $fillable = [
@@ -17,22 +20,33 @@ class Job extends Model
     ];
 
     protected $casts = [
-        'application_deadline' => 'date',
+        'application_deadline' => 'datetime',
     ];
 
     // Relationships
-    public function company()
+    public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
     }
 
-    public function category()
+    public function category(): BelongsTo
     {
         return $this->belongsTo(JobCategory::class, 'job_category_id');
     }
 
-    public function applications()      
+    public function applications(): HasMany
     {
         return $this->hasMany(Application::class);
+    }
+
+    // Scopes
+    public function scopeOpen($query)
+    {
+        return $query->where('status', 'open');
+    }
+
+    public function scopeByCompany($query, $companyId)
+    {
+        return $query->where('company_id', $companyId);
     }
 }

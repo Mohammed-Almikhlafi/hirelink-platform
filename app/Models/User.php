@@ -11,6 +11,8 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use App\Models\Role;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
 class User extends Authenticatable
 {
     use HasRoles;
@@ -33,9 +35,9 @@ class User extends Authenticatable
     // ...
 
     // Relationships
-    public function company()
+    public function company(): BelongsTo
     {
-        return $this->hasOne(Company::class);
+        return $this->belongsTo(Company::class);
     }
 
     public function jobs()
@@ -90,5 +92,10 @@ class User extends Authenticatable
     public function roles()
     {
         return $this->belongsToMany(Role::class);
+    }
+
+    public function isEmployer(): bool
+    {
+        return $this->role === 'employer';
     }
 }

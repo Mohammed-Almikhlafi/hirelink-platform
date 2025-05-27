@@ -1,6 +1,5 @@
 import React from 'react';
 import { Head } from '@inertiajs/react';
-import AppLayout from '@/Layouts/AppLayout';
 import { Building2, MapPin, Calendar } from 'lucide-react';
 import { Link } from '@inertiajs/react';
 import MainLayout from '@/Layouts/MainLayout';

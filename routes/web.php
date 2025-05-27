@@ -10,6 +10,7 @@ use App\Http\Controllers\EmployerJobController;
 use App\Http\Controllers\Public\LandingController;
 use App\Http\Controllers\Public\JobController as PublicJobController;
 use App\Http\Controllers\Public\CompanyController as PublicCompanyController;
+use App\Http\Controllers\JobApplicationController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -47,8 +48,11 @@ Route::middleware(['auth', 'verified', 'role:employer'])->group(function () {
     Route::get('/employer/jobs/{job}/edit', [EmployerJobController::class, 'edit'])->name('employer.jobs.edit');
     Route::put('/employer/jobs/{job}', [EmployerJobController::class, 'update'])->name('employer.jobs.update');
     Route::delete('/employer/jobs/{job}', [EmployerJobController::class, 'destroy'])->name('employer.jobs.destroy');
-    Route::get('/employer/jobs/{job}/applications', [EmployerJobController::class, 'applications'])->name('employer.jobs.applications');
-    Route::put('/employer/jobs/{job}/applications/{application}', [EmployerJobController::class, 'updateApplicationStatus'])->name('employer.jobs.applications.update');
+    // Job Applications
+    Route::get('/employer/jobs/{job}/applications', [JobApplicationController::class, 'index'])->name('employer.jobs.applications');
+    Route::get('/employer/jobs/{job}/applications/{application}/details', [JobApplicationController::class, 'details'])->name('employer.jobs.applications.details');
+    Route::put('/employer/jobs/{job}/applications/{application}', [JobApplicationController::class, 'update'])->name('employer.jobs.applications.update');
+    Route::get('/employer/jobs/{job}/applications/{application}/resume', [JobApplicationController::class, 'downloadResume'])->name('employer.jobs.applications.resume');
 });
 
 // Admin routes
@@ -68,6 +72,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/jobs/create', [JobController::class, 'create'])->name('jobs.create');
+    Route::post('/jobs', [JobController::class, 'store'])->name('jobs.store');
+    Route::get('/jobs/{job}/edit', [JobController::class, 'edit'])->name('jobs.edit');
+    Route::put('/jobs/{job}', [JobController::class, 'update'])->name('jobs.update');
+    Route::delete('/jobs/{job}', [JobController::class, 'destroy'])->name('jobs.destroy');
 });
 
 require __DIR__ . '/auth.php';
