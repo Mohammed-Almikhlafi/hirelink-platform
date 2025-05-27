@@ -7,7 +7,6 @@ const Show = ({ category }) => {
     return (
         <MainLayout>
             <Head title={category.name} />
-
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     <div className="bg-white dark:bg-slate-800 overflow-hidden shadow-xl sm:rounded-lg">
@@ -30,7 +29,7 @@ const Show = ({ category }) => {
 
                                 <div className="space-y-6">
                                     {category.jobs.length > 0 ? (
-                                        category.jobs.map(job => (
+                                        category.jobs.map((job) => (
                                             <JobCard key={job.id} job={job} />
                                         ))
                                     ) : (

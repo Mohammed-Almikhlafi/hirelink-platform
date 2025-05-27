@@ -15,11 +15,11 @@ export default function AppLayout({ children, title }) {
 
   // Public links always shown
   const navigation = [
-    { name: "Home", href: "/" },
-    { name: "Find Jobs", href: "/jobs" },
-    { name: "Find Talent", href: "/professionals" },
-    { name: "Categories", href: "/categories" },
-    { name: "About", href: "/about" },
+      { name: "Home", href: "/" },
+      { name: "Find Jobs", href: "/jobs" },
+      { name: "Find Talent", href: "/professionals" },
+      { name: "Categories", href: "/job-categories" },
+      { name: "About", href: "/about" },
   ];
 
   // Links only for authenticated users
@@ -89,7 +89,7 @@ export default function AppLayout({ children, title }) {
                   >
                     <img
                       src={auth.user.avatar_url || "/images/default-avatar.png"}
-                      alt={auth.user.name}
+                      // alt={auth.user.name}
                       className="w-8 h-8 rounded-full object-cover"
                     />
                     <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
