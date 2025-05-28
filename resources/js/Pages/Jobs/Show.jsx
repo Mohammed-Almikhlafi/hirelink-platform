@@ -3,8 +3,12 @@ import { Head } from '@inertiajs/react';
 import { Building2, MapPin, Calendar } from 'lucide-react';
 import { Link } from '@inertiajs/react';
 import MainLayout from '@/Layouts/MainLayout';
+import { usePage } from '@inertiajs/react';
 
-export default function Show({ job }) {
+
+export default function Show({ job, hasApplied, canApply }) {
+    const { auth } = usePage().props;
+
   return (
     <MainLayout title={job.title}>
       <Head title={job.title} />
@@ -34,12 +38,44 @@ export default function Show({ job }) {
             </div>
 
             {/* Apply Button */}
-            <Link
-              href={route('jobs.apply', job.id)}
-              className="btn-primary whitespace-nowrap"
-            >
-              Apply Now
-            </Link>
+            {/* Apply Button Section */}
+<div className="mt-6">
+  {!auth.user && (
+    <Link
+      href={route('login')}
+      className="btn-primary w-full text-center"
+    >
+      Login to Apply
+    </Link>
+  )}
+  
+  {auth.user && auth.user.role !== 'job_seeker' && (
+    <div className="text-sm text-gray-600 dark:text-gray-400 text-center">
+      Only job seekers can apply for jobs
+    </div>
+  )}
+
+  {auth.user && auth.user.role === 'job_seeker' && (
+    <>
+      {hasApplied ? (
+        <div className="bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-400 p-4 rounded-lg text-center">
+          You have already applied for this job
+        </div>
+      ) : canApply ? (
+        <Link
+          href={route('jobseeker.applications.create', job.id)}
+          className="btn-primary w-full text-center"
+        >
+          Apply Now
+        </Link>
+      ) : (
+        <div className="bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-400 p-4 rounded-lg text-center">
+          This job is no longer accepting applications
+        </div>
+      )}
+    </>
+  )}
+</div>
           </div>
 
           {/* Description */}

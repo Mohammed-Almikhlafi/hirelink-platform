@@ -62,6 +62,18 @@ class JobController extends Controller
 
         $job->load(['company', 'category']);
 
+        $hasApplied = false;
+        $canApply = false;
+
+        if (auth()->check() && auth()->user()->role === 'job_seeker') {
+            $hasApplied = $job->applications()
+                ->where('user_id', auth()->id())
+                ->exists();
+            $canApply = !$hasApplied && 
+                       $job->status === 'open' && 
+                       (!$job->application_deadline || now()->isBefore($job->application_deadline));
+        }
+
         $similarJobs = Job::with(['company', 'category'])
             ->where('status', 'open')
             ->where('id', '!=', $job->id)
@@ -73,16 +85,11 @@ class JobController extends Controller
             ->take(3)
             ->get();
 
-        $hasApplied = auth()->check() ? 
-            Application::where('job_id', $job->id)
-                ->where('user_id', auth()->id())
-                ->exists() : 
-            false;
-
         return Inertia::render('Jobs/Show', [
             'job' => $job,
             'similarJobs' => $similarJobs,
             'hasApplied' => $hasApplied,
+            'canApply' => $canApply,
         ]);
     }
 

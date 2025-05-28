@@ -13,6 +13,7 @@ use App\Http\Controllers\Public\CompanyController as PublicCompanyController;
 use App\Http\Controllers\JobApplicationController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Public\ProfessionalController;
+use App\Http\Controllers\JobSeekerApplicationController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -23,9 +24,6 @@ Route::get('/search', [LandingController::class, 'search'])->name('search');
 // Public job routes
 Route::get('/jobs', [PublicJobController::class, 'index'])->name('jobs.index');
 Route::get('/jobs/{job}', [PublicJobController::class, 'show'])->name('jobs.show');
-Route::post('/jobs/{job}/apply', [PublicJobController::class, 'apply'])
-    ->middleware(['auth', 'verified', 'role:professional'])
-    ->name('jobs.apply');
 
 // Public company routes
 Route::get('/companies', [PublicCompanyController::class, 'index'])->name('companies.index');
@@ -91,6 +89,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/jobs/{job}/edit', [JobController::class, 'edit'])->name('jobs.edit');
     Route::put('/jobs/{job}', [JobController::class, 'update'])->name('jobs.update');
     Route::delete('/jobs/{job}', [JobController::class, 'destroy'])->name('jobs.destroy');
+});
+
+// Job seeker routes
+Route::middleware(['auth', 'verified', 'role:job_seeker'])->group(function () {
+    Route::get('/applications', [JobSeekerApplicationController::class, 'index'])->name('jobseeker.applications.index');
+    Route::get('/applications/{application}', [JobSeekerApplicationController::class, 'show'])->name('jobseeker.applications.show');
+    Route::get('/jobs/{job}/apply', [JobSeekerApplicationController::class, 'create'])
+         ->name('jobseeker.applications.create');
+    Route::post('/jobs/{job}/apply', [JobSeekerApplicationController::class, 'store'])->name('jobseeker.applications.store');
+    Route::get('/applications/{application}/resume', [JobSeekerApplicationController::class, 'downloadResume'])->name('jobseeker.applications.resume');
 });
 
 require __DIR__ . '/auth.php';
