@@ -1,13 +1,13 @@
+// resources/js/Pages/Categories/Edit.jsx
 import React from "react";
-import { Head, useForm } from "@inertiajs/react";
+import { Head, useForm, Link } from "@inertiajs/react";
 import MainLayout from "@/Layouts/MainLayout.jsx";
 import InputLabel from "@/Components/InputLabel.jsx";
 import TextInput from "@/Components/TextInput.jsx";
 import InputError from "@/Components/InputError.jsx";
 import PrimaryButton from "@/Components/PrimaryButton.jsx";
 import { route } from "ziggy-js";
-import { Link } from "@inertiajs/react";
-
+import { Briefcase } from "lucide-react";
 
 /**
  * Category Edit Page
@@ -31,20 +31,21 @@ export default function Edit({ category }) {
             <Head title="Edit Category" />
 
             <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    {/* Page Title (بديل مؤقت لـ PageHeader) */}
-                    <div className="flex items-center justify-between mb-6">
-                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+                    {/* Header with Icon */}
+                    <div className="flex items-center gap-4 mb-8">
+                        <div
+                            className="w-12 h-12 rounded-xl bg-primary-50 dark:bg-primary-900/20 \
+                                flex items-center justify-center transition-transform duration-200"
+                        >
+                            <Briefcase className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+                        </div>
+                        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
                             Edit Category
                         </h1>
                         <Link
                             href={route("job-categories.index")}
-                            className={
-                                "inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-white focus:bg-gray-700 dark:focus:bg-white active:bg-gray-900 dark:active:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150" 
-                                   
-                            
-                            }
-                          
+                            className="ml-auto inline-flex items-center px-4 py-2 bg-gray-200 dark:bg-gray-700 border border-transparent rounded-md font-semibold text-sm text-gray-800 dark:text-gray-200 uppercase tracking-widest hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition"
                             aria-label="Back to Categories"
                         >
                             Back
@@ -52,8 +53,8 @@ export default function Edit({ category }) {
                     </div>
 
                     {/* Form Container */}
-                    <div className="bg-white dark:bg-slate-800 shadow sm:rounded-lg overflow-hidden">
-                        <div className="p-6">
+                    <div className="bg-white dark:bg-slate-800 shadow-lg rounded-xl overflow-hidden">
+                        <div className="p-8">
                             <form onSubmit={handleSubmit} className="space-y-6">
                                 {/* Name Field */}
                                 <div>
@@ -94,7 +95,7 @@ export default function Edit({ category }) {
                                                 e.target.value
                                             )
                                         }
-                                        className="mt-1 block w-full border-gray-300 dark:border-slate-600 dark:bg-slate-800 dark:text-white rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                                        className="mt-1 block w-full border-gray-300 dark:border-slate-600 dark:bg-slate-800 dark:text-white rounded-md shadow-sm focus:border-primary focus:ring focus:ring-primary/20 focus:ring-opacity-50"
                                         rows={4}
                                         aria-invalid={
                                             errors.description ? true : false
@@ -109,7 +110,7 @@ export default function Edit({ category }) {
                                 </div>
 
                                 {/* Submit Button */}
-                                <div className="flex items-center justify-end">
+                                <div className="flex justify-end">
                                     <PrimaryButton
                                         type="submit"
                                         disabled={processing}

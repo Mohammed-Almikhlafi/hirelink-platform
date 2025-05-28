@@ -6,7 +6,8 @@ import InputLabel from "@/Components/InputLabel.jsx";
 import TextInput from "@/Components/TextInput.jsx";
 import InputError from "@/Components/InputError.jsx";
 import PrimaryButton from "@/Components/PrimaryButton.jsx";
-import { route } from "ziggy-js"; // ← استيراد route
+import { route } from "ziggy-js";
+import { Briefcase } from "lucide-react"; // إضافة أيقونة Briefcase
 
 export default function CreateCategory() {
     const { data, setData, post, processing, errors } = useForm({
@@ -16,7 +17,7 @@ export default function CreateCategory() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        post(route("job-categories.store")); // ← الآن route معرفة
+        post(route("job-categories.store"));
     };
 
     return (
@@ -25,9 +26,18 @@ export default function CreateCategory() {
 
             <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                 <div className="bg-white dark:bg-slate-800 rounded-xl p-6 md:p-8 border border-slate-200 dark:border-slate-700/50">
-                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">
-                        🗂️ Create New Job Category
-                    </h1>
+                    {/* أيقونة وعنوان الصفحة */}
+                    <div className="flex items-center gap-4 mb-6">
+                        <div
+                            className="w-12 h-12 rounded-xl bg-primary-50 dark:bg-primary-900/20 \
+                                flex items-center justify-center transition-transform duration-200"
+                        >
+                            <Briefcase className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+                        </div>
+                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+                            Create New Job Category
+                        </h1>
+                    </div>
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {/* Name */}
