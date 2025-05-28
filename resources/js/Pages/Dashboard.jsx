@@ -12,7 +12,7 @@ import {
 export default function Dashboard({ auth, stats = {}, recentActivity = [], applications = [] }) {
   const isAdmin = auth.user.role === 'admin';
   const isEmployer = auth.user.role === 'employer';
-  const isJobSeeker = auth.user.role === 'professional';
+  const isJobSeeker = auth.user.role === 'job_seeker';
 
   return (
     <AppLayout title="Dashboard">
@@ -130,22 +130,22 @@ export default function Dashboard({ auth, stats = {}, recentActivity = [], appli
                 <>
                   <QuickAction
                     title="Add Category"
-                    // href={route('categories.create')}
+                    // href={route('job-categories.create')}
                     icon={Plus}
                   />
                   <QuickAction
                     title="Manage Users"
-                    href={route('users.index')}
+                    href={route('admin.users.index')}
                     icon={Users}
                   />
                   <QuickAction
                     title="View Reports"
-                    href="#"
+                    href={route('admin.reports')}
                     icon={ChartBar}
                   />
                   <QuickAction
                     title="Settings"
-                    href="#"
+                    href={route('admin.settings')}
                     icon={Settings}
                   />
                 </>

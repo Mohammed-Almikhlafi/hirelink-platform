@@ -66,7 +66,7 @@ class JobController extends Controller
             ->where('status', 'open')
             ->where('id', '!=', $job->id)
             ->where(function ($query) use ($job) {
-                $query->where('category_id', $job->category_id)
+                $query->where('job_category_id', $job->category_id)
                     ->orWhere('company_id', $job->company_id);
             })
             ->latest()

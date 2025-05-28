@@ -11,6 +11,8 @@ use App\Http\Controllers\Public\LandingController;
 use App\Http\Controllers\Public\JobController as PublicJobController;
 use App\Http\Controllers\Public\CompanyController as PublicCompanyController;
 use App\Http\Controllers\JobApplicationController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\Public\ProfessionalController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -29,6 +31,10 @@ Route::post('/jobs/{job}/apply', [PublicJobController::class, 'apply'])
 Route::get('/companies', [PublicCompanyController::class, 'index'])->name('companies.index');
 Route::get('/companies/{company}', [PublicCompanyController::class, 'show'])->name('companies.show');
 Route::get('/companies/{company}/jobs', [PublicCompanyController::class, 'jobs'])->name('companies.jobs');
+
+// Public professional routes
+Route::get('/professionals', [ProfessionalController::class, 'index'])->name('professionals.index');
+Route::get('/professionals/{professional}', [ProfessionalController::class, 'show'])->name('professionals.show');
 
 // Authentication routes
 Route::get('/login', fn() => Inertia::render('Auth/Login'))->name('login');
@@ -56,11 +62,19 @@ Route::middleware(['auth', 'verified', 'role:employer'])->group(function () {
 });
 
 // Admin routes
-Route::middleware(['auth', 'can:admin'])->group(function () {
-    Route::get('/job-categories/create', [JobCategoryController::class, 'create'])->name('job-categories.create');
-    Route::post('/job-categories', [JobCategoryController::class, 'store'])->name('job-categories.store');
-    Route::get('/users', [UserController::class, 'index'])->name('users.index');
-    Route::post('/users/{user}/roles', [UserController::class, 'updateRoles'])->name('users.updateRoles');
+Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+    Route::get('/reports', [AdminController::class, 'reports'])->name('reports');
+    Route::get('/settings', [AdminController::class, 'settings'])->name('settings');
+    
+    // User management routes
+    Route::get('/users', [App\Http\Controllers\Admin\UserController::class, 'index'])->name('users.index');
+    Route::get('/users/create', [App\Http\Controllers\Admin\UserController::class, 'create'])->name('users.create');
+    Route::post('/users', [App\Http\Controllers\Admin\UserController::class, 'store'])->name('users.store');
+    Route::get('/users/{user}/edit', [App\Http\Controllers\Admin\UserController::class, 'edit'])->name('users.edit');
+    Route::put('/users/{user}', [App\Http\Controllers\Admin\UserController::class, 'update'])->name('users.update');
+    Route::delete('/users/{user}', [App\Http\Controllers\Admin\UserController::class, 'destroy'])->name('users.destroy');
+    Route::patch('/users/{user}/toggle-status', [App\Http\Controllers\Admin\UserController::class, 'toggleStatus'])->name('users.toggle-status');
 });
 
 // Category routes

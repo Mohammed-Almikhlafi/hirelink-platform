@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from '@inertiajs/react';
 import { MapPin, Briefcase, Star, MessageCircle } from 'lucide-react';
-
+import { route } from 'ziggy-js';
 export default function UserCard({ user }) {
   const avatar = user.avatar_url || '/images/default-avatar.png';
   const rating = user.rating || 0;
@@ -76,7 +76,7 @@ export default function UserCard({ user }) {
       {/* Actions */}
       <div className="flex items-center gap-3">
         <Link
-          href={`/profile/${user.id}`}
+          href={route('professionals.show', user.id)}
           className="btn-primary flex-1 text-center text-sm py-2"
         >
           View Profile

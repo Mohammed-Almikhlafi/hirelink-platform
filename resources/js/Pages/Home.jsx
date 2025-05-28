@@ -2,13 +2,11 @@
 import React from 'react';
 import { Head } from '@inertiajs/react';
 import AppLayout from '@/Layouts/AppLayout';
-import HeroSection from '@/Components/HeroSection';
 import CategoriesSection from '@/Components/CategoriesSection';
 import ProfessionalsSection from '@/Components/ProfessionalsSection';
 import FeaturedJobsSection from '@/Components/FeaturedJobsSection';
 
-export default function Home({ user = null, jobs = [], categories = [], users = [] }) {
-  // Loading check
+export default function Home({ jobs = [], categories = [], users = [] }) {
   if (!Array.isArray(jobs) || !Array.isArray(categories) || !Array.isArray(users)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900">
@@ -42,7 +40,7 @@ export default function Home({ user = null, jobs = [], categories = [], users = 
             </p>
 
             <div className="flex flex-wrap justify-center gap-4">
-              <a href="#search" className="btn-primary">
+              <a href={route('jobs.index')} className="btn-primary">
                 Search Jobs
               </a>
               <a href="#categories" className="btn-secondary bg-white/10 hover:bg-white/20 text-white border-white/10">
@@ -52,11 +50,6 @@ export default function Home({ user = null, jobs = [], categories = [], users = 
           </div>
         </div>
       </section>
-
-      {/* Search Section */}
-      <div id="search">
-        <HeroSection categories={categories} />
-      </div>
 
       {/* Main Content */}
       <main>
