@@ -40,11 +40,11 @@ class JobController extends Controller
             ->paginate(12);
 
         return Inertia::render('Jobs/Index', [
-            'jobs' => $jobs,
-            'filters' => [
-                'query' => $query,
+            'jobs'       => $jobs,
+            'filters'    => [
+                'query'    => $query,
                 'category' => $category,
-                'type' => $type,
+                'type'     => $type,
                 'location' => $location,
             ],
             'categories' => JobCategory::select('id', 'name')->get(),
@@ -66,23 +66,23 @@ class JobController extends Controller
             ->where('status', 'open')
             ->where('id', '!=', $job->id)
             ->where(function ($query) use ($job) {
-                $query->where('category_id', $job->category_id)
+                $query->where('job_category_id', $job->job_category_id)
                     ->orWhere('company_id', $job->company_id);
             })
             ->latest()
             ->take(3)
             ->get();
 
-        $hasApplied = auth()->check() ? 
-            Application::where('job_id', $job->id)
-                ->where('user_id', auth()->id())
-                ->exists() : 
-            false;
+        $hasApplied = auth()->check()
+            ? Application::where('job_id', $job->id)
+            ->where('user_id', auth()->id())
+            ->exists()
+            : false;
 
         return Inertia::render('Jobs/Show', [
-            'job' => $job,
+            'job'         => $job,
             'similarJobs' => $similarJobs,
-            'hasApplied' => $hasApplied,
+            'hasApplied'  => $hasApplied,
         ]);
     }
 
@@ -100,7 +100,8 @@ class JobController extends Controller
 
         if (Application::where('job_id', $job->id)
             ->where('user_id', auth()->id())
-            ->exists()) {
+            ->exists()
+        ) {
             return back()->with('error', 'You have already applied for this job.');
         }
 
@@ -109,9 +110,9 @@ class JobController extends Controller
         ]);
 
         $application = Application::create([
-            'job_id' => $job->id,
-            'user_id' => auth()->id(),
-            'status' => 'pending',
+            'job_id'       => $job->id,
+            'user_id'      => auth()->id(),
+            'status'       => 'pending',
             'cover_letter' => $validated['cover_letter'],
         ]);
 
@@ -120,4 +121,4 @@ class JobController extends Controller
         return redirect()->route('jobs.show', $job)
             ->with('success', 'Application submitted successfully.');
     }
-} 
+}

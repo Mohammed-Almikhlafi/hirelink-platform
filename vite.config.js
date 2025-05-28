@@ -11,4 +11,8 @@ export default defineConfig({
         }),
         react(),
     ],
+    server: {
+        host: 'localhost',  // هذا مهم عشان يحل مشكلة استخدام [::1]
+        port: 5173,
+    },
 });

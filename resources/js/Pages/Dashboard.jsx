@@ -130,7 +130,9 @@ export default function Dashboard({ auth, stats = {}, recentActivity = [], appli
                 <>
                   <QuickAction
                     title="Add Category"
-                    // href={route('categories.create')}
+                 
+                    href={route("job-categories.create")}
+                 
                     icon={Plus}
                   />
                   <QuickAction
@@ -155,7 +157,7 @@ export default function Dashboard({ auth, stats = {}, recentActivity = [], appli
                 <>
                   <QuickAction
                     title="Post Job"
-                    href={route('jobs.create')}
+                    href={route('employer.jobs.create')}
                     icon={Plus}
                   />
                   <QuickAction
