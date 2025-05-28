@@ -15,7 +15,8 @@ export default function Home({ jobs = [], categories = [], users = [] }) {
           <div className="w-12 h-12 mx-auto rounded-full bg-primary/20" />
           <p className="text-lg text-slate-600 dark:text-slate-400">Loading...</p>
         </div>
-      </div>
+        
+      </div>                                                                                                                                                                                                                              
     );
   }
 
