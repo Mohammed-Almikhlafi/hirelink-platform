@@ -8,10 +8,10 @@ trait RecordsActivity
     /**
      * Record an activity.
      */
-    public function recordActivity(string $type, string $title, string $description, $subject = null)
+    public function recordActivity(string $type, string $title, string $description, $subject = null, $user = null)
     {
         Activity::create([
-            'user_id' => auth()->id(),
+            'user_id' => $user ? $user->id : auth()->id(),
             'type' => $type,
             'title' => $title,
             'description' => $description,
@@ -28,8 +28,9 @@ trait RecordsActivity
         $this->recordActivity(
             'job_application',
             'New Application Received',
-            "{$application->user->name} applied for {$application->job->title}",
-            $application
+            "Application submitted for {$application->job->title}",
+            $application,
+            $application->user
         );
     }
 
@@ -81,6 +82,7 @@ trait RecordsActivity
             'user_registration',
             'New User Registration',
             "A new {$user->role} has joined the platform",
+            $user,
             $user
         );
     }
@@ -94,7 +96,8 @@ trait RecordsActivity
             'company_registered',
             'New Company Registered',
             "{$company->name} has registered on the platform",
-            $company
+            $company,
+            $company->user
         );
     }
 } 
