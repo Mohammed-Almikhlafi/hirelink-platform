@@ -25,6 +25,7 @@ return new class extends Migration
             $table->string('location')->nullable();
             $table->string('website_url')->nullable();
             $table->string('avatar_url')->nullable();
+            $table->boolean('is_active')->default(true);
             $table->rememberToken(); 
             $table->timestamps();
             $table->softDeletes();

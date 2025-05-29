@@ -4,24 +4,23 @@ import { router } from '@inertiajs/react';
 import { Search, Filter, X } from 'lucide-react';
 
 export default function JobFilters({ filters = {}, categories = [] }) {
-  const [searchTerm, setSearchTerm]             = useState(filters.q || '');
+  const [searchTerm, setSearchTerm] = useState(filters.query || '');
   const [selectedCategory, setSelectedCategory] = useState(filters.category || '');
-  const [location, setLocation]                 = useState(filters.location || '');
-  const [jobType, setJobType]                   = useState(filters.type || '');
-  const [minSalary, setMinSalary]               = useState(filters.min_salary || '');
-  const [maxSalary, setMaxSalary]               = useState(filters.max_salary || '');
-  const [showFilters, setShowFilters]           = useState(false);
+  const [location, setLocation] = useState(filters.location || '');
+  const [jobType, setJobType] = useState(filters.type || '');
+  const [showFilters, setShowFilters] = useState(false);
 
   // Send filters back to server
   const applyFilters = () => {
     router.get(route('jobs.index'), {
-      q:            searchTerm || undefined,
-      category:     selectedCategory || undefined,
-      location:     location || undefined,
-      type:         jobType || undefined,
-      min_salary:   minSalary || undefined,
-      max_salary:   maxSalary || undefined,
-    }, { preserveState: true });
+      query: searchTerm || undefined,
+      category: selectedCategory || undefined,
+      location: location || undefined,
+      type: jobType || undefined,
+    }, { 
+      preserveState: true,
+      preserveScroll: true,
+    });
   };
 
   // Reset all
@@ -30,9 +29,10 @@ export default function JobFilters({ filters = {}, categories = [] }) {
     setSelectedCategory('');
     setLocation('');
     setJobType('');
-    setMinSalary('');
-    setMaxSalary('');
-    router.get(route('jobs.index'), {}, { preserveState: true });
+    router.get(route('jobs.index'), {}, { 
+      preserveState: true,
+      preserveScroll: true,
+    });
   };
 
   return (
@@ -59,7 +59,7 @@ export default function JobFilters({ filters = {}, categories = [] }) {
         >
           <Filter className="w-5 h-5" />
           Filters
-          {(selectedCategory || location || jobType || minSalary || maxSalary) && (
+          {(selectedCategory || location || jobType) && (
             <span className="w-2 h-2 rounded-full bg-primary" />
           )}
         </button>
@@ -122,34 +122,6 @@ export default function JobFilters({ filters = {}, categories = [] }) {
               <option value="contract">Contract</option>
               <option value="internship">Internship</option>
             </select>
-          </div>
-
-          {/* Salary Range */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Min Salary
-              </label>
-              <input
-                type="number"
-                placeholder="0"
-                value={minSalary}
-                onChange={e => setMinSalary(e.target.value)}
-                className="input"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                Max Salary
-              </label>
-              <input
-                type="number"
-                placeholder="Any"
-                value={maxSalary}
-                onChange={e => setMaxSalary(e.target.value)}
-                className="input"
-              />
-            </div>
           </div>
 
           {/* Clear Buttons */}
