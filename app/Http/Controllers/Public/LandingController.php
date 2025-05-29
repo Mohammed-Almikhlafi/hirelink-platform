@@ -17,7 +17,7 @@ class LandingController extends Controller
      */
     public function index()
     {
-        $featuredJobs = Job::with(['company', 'category'])
+        $jobs = Job::with(['company', 'category'])
             ->where('status', 'open')
             ->whereDate('application_deadline', '>', now())
             ->latest()
@@ -50,7 +50,7 @@ class LandingController extends Controller
                 ];
             });
 
-        $professionals = User::where('role', 'job_seeker')
+        $users = User::where('role', 'job_seeker')
             ->where('is_active', true)
             ->with(['jobCategory', 'skills'])
             ->latest()
@@ -69,9 +69,9 @@ class LandingController extends Controller
             });
 
         return Inertia::render('Home', [
-            'featuredJobs' => $featuredJobs,
+            'jobs' => $jobs,
             'categories' => $categories,
-            'professionals' => $professionals,
+            'users' => $users,
         ]);
     }
 
