@@ -17,11 +17,20 @@ class HomeController extends Controller
      */
     public function index(Request $request)
     {
-        // جلب أحدث 6 مستخدمين مع الحقول المطلوبة
+        // جلب أحدث 6 مستخدمين وتحويلهم إلى مصفوفة
         $users = User::select('id', 'name', 'specialization', 'avatar_url')
             ->latest()
             ->take(6)
-            ->get();
+            ->get()
+            ->map(function ($u) {
+                return [
+                    'id'             => $u->id,
+                    'name'           => $u->name,
+                    'specialization' => $u->specialization,
+                    'avatar_url'     => $u->avatar_url,
+                ];
+            })
+            ->toArray();
 
         // جلب الوظائف مع بيانات الشركة
         $jobs = Job::with('company')
@@ -35,10 +44,12 @@ class HomeController extends Controller
                     'posted_at' => $job->created_at->toDateString(),
                     'company'   => ['name' => $job->company->name ?? null],
                 ];
-            });
+            })
+            ->toArray();
 
-        // جلب الأقسام مع عدد الوظائف والمستخدمين المصرّفين في كل قسم
-        $categories = JobCategory::with(['users'])->withCount('jobs')
+        // جلب الأقسام مع عدد الوظائف والمستخدمين
+        $categories = JobCategory::with(['users'])
+            ->withCount('jobs')
             ->orderBy('name')
             ->get()
             ->map(function ($cat) {
@@ -46,18 +57,20 @@ class HomeController extends Controller
                     'id'         => $cat->id,
                     'name'       => $cat->name,
                     'jobs_count' => $cat->jobs_count,
+                    'users_count' => $cat->users->count(),
                     'users'      => $cat->users->map(function ($user) {
                         return [
                             'id'             => $user->id,
                             'name'           => $user->name,
                             'specialization' => $user->specialization,
                         ];
-                    }),
+                    })->toArray(),
                 ];
-            });
+            })
+            ->toArray();
 
         // عرض الصفحة مع تمرير البيانات للواجهة
-        return Inertia::render('Home', [ 
+        return Inertia::render('Home', [
             'jobs'       => $jobs,
             'categories' => $categories,
             'users'      => $users,
