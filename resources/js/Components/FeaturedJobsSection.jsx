@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link } from '@inertiajs/react';
-import { Briefcase, MapPin, Clock, DollarSign, ArrowRight, Building2 } from 'lucide-react';
+import { Briefcase, MapPin, Clock, ArrowRight, Building2 } from 'lucide-react';
 
-export default function FeaturedJobsSection({ jobs, className = '' }) {
+export default function FeaturedJobsSection({ jobs = [], className = '' }) {
   return (
     <section className={className}>
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
@@ -16,8 +16,8 @@ export default function FeaturedJobsSection({ jobs, className = '' }) {
           </div>
         </div>
 
-        <Link 
-          href="/jobs"
+        <Link
+          href={route('jobs.index')}
           className="btn-secondary inline-flex items-center gap-2 text-sm whitespace-nowrap"
         >
           All Jobs
@@ -69,30 +69,14 @@ export default function FeaturedJobsSection({ jobs, className = '' }) {
                 </div>
                 {job.salary && (
                   <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
-                    <DollarSign className="w-4 h-4" />
                     <span>{job.salary}</span>
                   </div>
                 )}
               </div>
 
-              {/* Tags */}
-              {job.tags && (
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {job.tags.slice(0, 3).map((tag, index) => (
-                    <span
-                      key={index}
-                      className="px-2 py-1 text-xs font-medium text-primary-600 dark:text-primary-400 
-                        bg-primary-50 dark:bg-primary-900/20 rounded-full"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              )}
-
               {/* Action */}
               <Link
-                href={`/jobs/${job.id}`}
+                href={route('jobs.show', job.id)}
                 className="btn-primary w-full text-center text-sm"
               >
                 View Details

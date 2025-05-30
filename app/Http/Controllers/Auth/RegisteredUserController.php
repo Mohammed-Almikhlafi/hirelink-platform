@@ -6,6 +6,7 @@ use App\Models\JobCategory;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
+use App\Traits\RecordsActivity;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -17,6 +18,8 @@ use Inertia\Response;
 
 class RegisteredUserController extends Controller
 {   
+    use RecordsActivity;
+
     /**
      * Display the registration view.
      */
@@ -24,6 +27,7 @@ class RegisteredUserController extends Controller
     {
         return Inertia::render('Auth/Register', [
             'categories' => JobCategory::all(),
+            'defaultRole' => config('auth.defaults.role', 'job_seeker'),
         ]);
     }
 
@@ -39,8 +43,9 @@ class RegisteredUserController extends Controller
             'email' => 'required|string|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'specialization' => 'required|string|max:255',
-            'job_category_id' => 'required|exists:job_categories,id', 
-
+            'job_category_id' => 'required|exists:job_categories,id',
+            'role' => 'required|in:job_seeker,employer',
+            'location' => 'required|string|max:255',
         ]);
 
         $user = User::create([
@@ -49,15 +54,19 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
             'specialization' => $request->specialization,
             'job_category_id' => $request->job_category_id,
-
-
+            'role' => $request->role,
+            'location' => $request->location,
+            'is_active' => true,
         ]);
 
-        
+        // Dispatch the Registered event for email verification
+        event(new Registered($user));
 
-        // event(new Registered($user));
-
+        // Log in the user first
         Auth::login($user);
+
+        // Now record the activity after the user is authenticated
+        $this->recordUserRegistration($user);
 
         return redirect(RouteServiceProvider::HOME);
     }

@@ -12,7 +12,7 @@ import {
 export default function Dashboard({ auth, stats = {}, recentActivity = [], applications = [] }) {
   const isAdmin = auth.user.role === 'admin';
   const isEmployer = auth.user.role === 'employer';
-  const isJobSeeker = auth.user.role === 'professional';
+  const isJobSeeker = auth.user.role === 'job_seeker';
 
   return (
     <AppLayout title="Dashboard">
@@ -130,24 +130,22 @@ export default function Dashboard({ auth, stats = {}, recentActivity = [], appli
                 <>
                   <QuickAction
                     title="Add Category"
-                 
-                    href={route("job-categories.create")}
-                 
+                    href={route('job-categories.create')}
                     icon={Plus}
                   />
                   <QuickAction
                     title="Manage Users"
-                    href={route('users.index')}
+                    href={route('admin.users.index')}
                     icon={Users}
                   />
                   <QuickAction
                     title="View Reports"
-                    href="#"
+                    href={route('admin.reports')}
                     icon={ChartBar}
                   />
                   <QuickAction
                     title="Settings"
-                    href="#"
+                    href={route('admin.settings')}
                     icon={Settings}
                   />
                 </>
@@ -206,43 +204,44 @@ export default function Dashboard({ auth, stats = {}, recentActivity = [], appli
           </div>
 
           {/* Recent Activity */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700/50">
-              <div className="p-6">
-                <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
-                  Recent Activity
-                </h2>
-                <div className="space-y-4">
-                  {recentActivity.map((activity, index) => (
+          { isJobSeeker && (
+            <div className="mb-8">
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
+                Recent Activity
+              </h2>
+              <div className="space-y-4">
+                {recentActivity.length > 0 ? (
+                  recentActivity.map((activity, index) => (
                     <ActivityItem key={index} activity={activity} />
-                  ))}
-                  {recentActivity.length === 0 && (
-                    <p className="text-sm text-slate-600 dark:text-slate-400">
-                      No recent activity to show.
-                    </p>
-                  )}
-                </div>
+                  ))
+                ) : (
+                  <p className="text-slate-600 dark:text-slate-400">
+                    No recent activity found.
+                  </p>
+                )}
               </div>
             </div>
+          )}
 
-            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700/50">
-              <div className="p-6">
-                <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
-                  {isEmployer ? 'Recent Applications' : 'My Applications'}
-                </h2>
-                <div className="space-y-4">
-                  {applications.map((application, index) => (
-                    <ApplicationItem key={index} application={application} />
-                  ))}
-                  {applications.length === 0 && (
-                    <p className="text-sm text-slate-600 dark:text-slate-400">
-                      No applications to show.
-                    </p>
-                  )}
-                </div>
+          {/* Applications Section */}
+          {isJobSeeker && (
+            <div id="applications" className="mb-8">
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
+                My Applications
+              </h2>
+              <div className="space-y-4">
+                {applications.length > 0 ? (
+                  applications.map((app, index) => (
+                    <ApplicationItem key={index} application={app} />
+                  ))
+                ) : (
+                  <p className="text-slate-600 dark:text-slate-400">
+                    You haven't applied to any jobs yet.
+                  </p>
+                )}
               </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </AppLayout>

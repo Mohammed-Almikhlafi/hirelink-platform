@@ -12,7 +12,12 @@ class Application extends Model
     use RecordsActivity;
 
     protected $fillable = [
-        'user_id', 'job_id', 'status', 'cover_letter'
+        'user_id',
+        'job_id',
+        'cover_letter',
+        'resume_path',          
+        'application_status',   
+        'applied_at',          
     ];
 
     protected static function booted()
@@ -22,16 +27,15 @@ class Application extends Model
         });
 
         static::updating(function ($application) {
-            if ($application->isDirty('status')) {
+            if ($application->isDirty('application_status')) {
                 $application->recordApplicationStatusUpdate(
                     $application,
-                    $application->getOriginal('status')
+                    $application->getOriginal('application_status')
                 );
             }
         });
     }
 
-    // Relationships
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
