@@ -9,6 +9,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployerJobController;
 use App\Http\Controllers\Public\LandingController;
 use App\Http\Controllers\Public\JobController as PublicJobController;
+use App\Http\Controllers\Public\JobController;
 use App\Http\Controllers\Public\CompanyController as PublicCompanyController;
 use App\Http\Controllers\JobApplicationController;
 use App\Http\Controllers\AdminController;
@@ -162,5 +163,12 @@ Route::middleware(['auth', 'verified', 'role:job_seeker'])->group(function () {
     Route::get('/applications/{application}/resume', [JobSeekerApplicationController::class, 'downloadResume'])
         ->name('jobseeker.applications.resume');
 });
+
+Route::get('/professionals', [ProfessionalController::class, 'index'])
+    ->name('professionals.index');
+
+Route::get('/professionals/{professional}', [ProfessionalController::class, 'show'])
+    ->name('professionals.show');
+
 
 require __DIR__ . '/auth.php';
