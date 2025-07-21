@@ -160,13 +160,19 @@ export default function Dashboard({ auth, stats = {}, recentActivity = [], appli
                   />
                   <QuickAction
                     title="View Applications"
-                    href="#applications"
+                    href={route('employer.applications.all')}
                     icon={FileText}
                   />
                   <QuickAction
                     title="Company Profile"
-                    href="#"
+                    href={route('employer.company.show')}
                     icon={Building2}
+                  />
+
+                  <QuickAction
+                    title="View Posted Jobs"
+                    href={route('employer.jobs.index')}
+                    icon={FileText}
                   />
                   <QuickAction
                     title="Settings"

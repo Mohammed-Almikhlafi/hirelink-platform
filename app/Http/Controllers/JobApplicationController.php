@@ -56,4 +56,34 @@ class JobApplicationController extends Controller
 
         return response()->download(storage_path('app/public/' . $application->resume_url));
     }
+
+    public function allApplications(Request $request)
+    {
+        $applications = $request->user()->companyApplications()
+            ->with([
+                'job:id,title,status',
+                'user:id,name,email',
+                'user.profile:id,user_id,phone,resume_path'
+            ])
+            ->when($request->search, function($query) use ($request) {
+                $query->whereHas('user', function($q) use ($request) {
+                    $q->where('name', 'like', "%{$request->search}%")
+                    ->orWhere('email', 'like', "%{$request->search}%");
+                })
+                ->orWhereHas('job', function($q) use ($request) {
+                    $q->where('title', 'like', "%{$request->search}%");
+                });
+            })
+            ->when($request->status, function($query) use ($request) {
+                $query->where('status', $request->status);
+            })
+            ->latest()
+            ->paginate(15)
+            ->withQueryString();
+
+        return Inertia::render('Employer/Applications/All', [
+            'applications' => $applications,
+            'filters' => $request->only(['search', 'status']),
+        ]);
+    }
 } 

@@ -12,6 +12,7 @@ use App\Http\Controllers\Public\JobController as PublicJobController;
 use App\Http\Controllers\Public\CompanyController as PublicCompanyController;
 use App\Http\Controllers\JobApplicationController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\Public\ProfessionalController;
 use App\Http\Controllers\JobSeekerApplicationController;
 use Illuminate\Support\Facades\Route;
@@ -38,16 +39,14 @@ Route::get('/professionals/{professional}', [ProfessionalController::class, 'sho
 Route::get('/login', fn() => Inertia::render('Auth/Login'))->name('login');
 Route::get('/register', fn() => Inertia::render('Auth/Register'))->name('register');
 
-
-// Public category routes (index & show only)
+// Public category routes
 Route::get('/job-categories', [JobCategoryController::class, 'index'])
     ->name('job-categories.index');
 Route::get('/job-categories/{category}', [JobCategoryController::class, 'show'])
     ->whereNumber('category')
     ->name('job-categories.show');
 
-
-// Admin routes (Job Categories & Users)
+// Admin routes
 Route::middleware(['auth', 'can:admin'])->group(function () {
     // Job Categories CRUD
     Route::get('/job-categories/create', [JobCategoryController::class, 'create'])
@@ -69,10 +68,7 @@ Route::middleware(['auth', 'can:admin'])->group(function () {
     Route::post('/users/{user}/roles', [UserController::class, 'updateRoles'])
         ->name('users.updateRoles');
 });
-// Route::get('/job-categories/{category}/edit', [CategoryController::class, 'edit'])->name('job-categories.edit');
-// Route::put('/job-categories/{category}', [CategoryController::class, 'update'])->name('job-categories.update');
 
-Route::get('/categories/{category}', [CategoryController::class, 'show'])->name('categories.show');
 // Dashboard
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
@@ -80,61 +76,91 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 
 // Employer routes
 Route::middleware(['auth', 'verified', 'role:employer'])->group(function () {
-    Route::get('/employer/jobs', [EmployerJobController::class, 'index'])->name('employer.jobs.index');
-    Route::get('/employer/jobs/create', [EmployerJobController::class, 'create'])->name('employer.jobs.create');
-    Route::post('/employer/jobs', [EmployerJobController::class, 'store'])->name('employer.jobs.store');
-    Route::get('/employer/jobs/{job}', [EmployerJobController::class, 'show'])->name('employer.jobs.show');
-    Route::get('/employer/jobs/{job}/edit', [EmployerJobController::class, 'edit'])->name('employer.jobs.edit');
-    Route::put('/employer/jobs/{job}', [EmployerJobController::class, 'update'])->name('employer.jobs.update');
-    Route::delete('/employer/jobs/{job}', [EmployerJobController::class, 'destroy'])->name('employer.jobs.destroy');
-    // Job Applications
-    Route::get('/employer/jobs/{job}/applications', [JobApplicationController::class, 'index'])->name('employer.jobs.applications');
-    Route::get('/employer/jobs/{job}/applications/{application}/details', [JobApplicationController::class, 'details'])->name('employer.jobs.applications.details');
-    Route::put('/employer/jobs/{job}/applications/{application}', [JobApplicationController::class, 'update'])->name('employer.jobs.applications.update');
-    Route::get('/employer/jobs/{job}/applications/{application}/resume', [JobApplicationController::class, 'downloadResume'])->name('employer.jobs.applications.resume');
+    // Company setup routes (available to all employers)
+    Route::get('/employer/company/create', [CompanyController::class, 'create'])
+        ->name('employer.company.create')
+        ->withoutMiddleware('employer.hasCompany');
+        
+    Route::post('/employer/company', [CompanyController::class, 'store'])
+        ->name('employer.company.store')
+        ->withoutMiddleware('employer.hasCompany');
+    
+                // Add this route definition
+
+    // Protected employer routes (require company setup)
+    Route::middleware('employer.hasCompany')->group(function () {
+
+        Route::get('/employer/company', [CompanyController::class, 'show'])
+            ->name('employer.company.show');
+
+        Route::get('/employer/company/edit', [CompanyController::class, 'edit'])
+            ->name('employer.company.edit');
+        
+        Route::put('/employer/company', [CompanyController::class, 'update'])
+            ->name('employer.company.update');
+
+        // Job routes with proper naming
+        Route::prefix('employer')->name('employer.')->group(function () {
+            Route::resource('jobs', EmployerJobController::class)->names([
+                'index' => 'jobs.index',
+                'create' => 'jobs.create',
+                'store' => 'jobs.store',
+                'show' => 'jobs.show',
+                'edit' => 'jobs.edit',
+                'update' => 'jobs.update',
+                'destroy' => 'jobs.destroy'
+            ]);
+
+            Route::get('/applications', [JobApplicationController::class, 'allApplications'])
+                ->name('applications.all');
+
+            Route::get('jobs/{job}', [EmployerJobController::class, 'show'])
+                ->name('jobs.show');
+            
+            // Job Applications - Single definition with consistent naming
+            Route::get('jobs/{job}/applications', [JobApplicationController::class, 'index'])
+                ->name('jobs.applications');
+            Route::get('jobs/{job}/applications/{application}', [JobApplicationController::class, 'show'])
+                ->name('jobs.applications.show');
+            Route::put('jobs/{job}/applications/{application}', [JobApplicationController::class, 'update'])
+                ->name('jobs.applications.update');
+            Route::get('jobs/{job}/applications/{application}/resume', [JobApplicationController::class, 'downloadResume'])
+                ->name('jobs.applications.resume');
+        });
+    });
 });
 
-// Admin routes
+// Admin dashboard routes
 Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
     Route::get('/reports', [AdminController::class, 'reports'])->name('reports');
     Route::get('/settings', [AdminController::class, 'settings'])->name('settings');
     
-    // User management routes
-    Route::get('/users', [App\Http\Controllers\Admin\UserController::class, 'index'])->name('users.index');
-    Route::get('/users/create', [App\Http\Controllers\Admin\UserController::class, 'create'])->name('users.create');
-    Route::post('/users', [App\Http\Controllers\Admin\UserController::class, 'store'])->name('users.store');
-    Route::get('/users/{user}/edit', [App\Http\Controllers\Admin\UserController::class, 'edit'])->name('users.edit');
-    Route::put('/users/{user}', [App\Http\Controllers\Admin\UserController::class, 'update'])->name('users.update');
-    Route::delete('/users/{user}', [App\Http\Controllers\Admin\UserController::class, 'destroy'])->name('users.destroy');
-    Route::patch('/users/{user}/toggle-status', [App\Http\Controllers\Admin\UserController::class, 'toggleStatus'])->name('users.toggle-status');
+    // User management
+    Route::resource('users', App\Http\Controllers\Admin\UserController::class)->except(['show']);
+    Route::patch('/users/{user}/toggle-status', [App\Http\Controllers\Admin\UserController::class, 'toggleStatus'])
+        ->name('users.toggle-status');
 });
 
-// Category routes
-Route::get('/job-categories/{id}', [JobCategoryController::class, 'show'])->name('job-categories.show');
-
-// User and profile routes
+// Profile routes
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::resource('users', UserController::class)
-        ->only(['index', 'show']);
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    Route::get('/jobs/create', [JobController::class, 'create'])->name('jobs.create');
-    Route::post('/jobs', [JobController::class, 'store'])->name('jobs.store');
-    Route::get('/jobs/{job}/edit', [JobController::class, 'edit'])->name('jobs.edit');
-    Route::put('/jobs/{job}', [JobController::class, 'update'])->name('jobs.update');
-    Route::delete('/jobs/{job}', [JobController::class, 'destroy'])->name('jobs.destroy');
 });
 
 // Job seeker routes
 Route::middleware(['auth', 'verified', 'role:job_seeker'])->group(function () {
-    Route::get('/applications', [JobSeekerApplicationController::class, 'index'])->name('jobseeker.applications.index');
-    Route::get('/applications/{application}', [JobSeekerApplicationController::class, 'show'])->name('jobseeker.applications.show');
+    Route::get('/applications', [JobSeekerApplicationController::class, 'index'])
+        ->name('jobseeker.applications.index');
+    Route::get('/applications/{application}', [JobSeekerApplicationController::class, 'show'])
+        ->name('jobseeker.applications.show');
     Route::get('/jobs/{job}/apply', [JobSeekerApplicationController::class, 'create'])
-         ->name('jobseeker.applications.create');
-    Route::post('/jobs/{job}/apply', [JobSeekerApplicationController::class, 'store'])->name('jobseeker.applications.store');
-    Route::get('/applications/{application}/resume', [JobSeekerApplicationController::class, 'downloadResume'])->name('jobseeker.applications.resume');
+        ->name('jobseeker.applications.create');
+    Route::post('/jobs/{job}/apply', [JobSeekerApplicationController::class, 'store'])
+        ->name('jobseeker.applications.store');
+    Route::get('/applications/{application}/resume', [JobSeekerApplicationController::class, 'downloadResume'])
+        ->name('jobseeker.applications.resume');
 });
 
 require __DIR__ . '/auth.php';

@@ -59,14 +59,15 @@ class RegisteredUserController extends Controller
             'is_active' => true,
         ]);
 
-        // Dispatch the Registered event for email verification
         event(new Registered($user));
-
-        // Log in the user first
         Auth::login($user);
-
-        // Now record the activity after the user is authenticated
         $this->recordUserRegistration($user);
+
+        // Redirect employers to company setup
+        if ($user->role === 'employer') {
+            return redirect()->route('employer.company.create')
+                ->with('success', 'Account created! Please set up your company.');
+        }
 
         return redirect(RouteServiceProvider::HOME);
     }

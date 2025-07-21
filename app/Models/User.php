@@ -98,4 +98,21 @@ class User extends Authenticatable
     {
         return $this->role === 'employer';
     }
+
+
+    public function companyApplications()
+    {
+        if ($this->role === 'employer') {
+            return $this->hasManyThrough(
+                Application::class,
+                company::class,
+                'user_id', 
+                'job_id',   
+                'id',       
+                'id'       
+            );
+        }
+        
+        throw new \BadMethodCallException('This method is only available for employers');
+    }
 }
