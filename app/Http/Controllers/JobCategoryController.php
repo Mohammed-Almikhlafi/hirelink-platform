@@ -87,8 +87,21 @@ class JobCategoryController extends Controller
             'jobs'        => $category->jobs->map(fn($j) => [
                 'id'        => $j->id,
                 'title'     => $j->title,
-                'company'   => $j->company->name,
-                'posted_at' => $j->created_at->diffForHumans(),
+                'location',
+                'description'       => $j->description,
+                'job_type'          => $j->job_type,
+                'salary_range'      => $j->salary_range,
+                'application_deadline' => $j->application_deadline,
+                'created_at'        => $j->created_at,
+                'company'   => [
+                'id'   => $j->company->id,
+                'name' => $j->company->name,
+                ],
+                'category' => [
+                    'id'   => $j->category->id,
+                    'name' => $j->category->name,
+                ],
+                'posted_at' => $j->created_at->diffForHumans()
             ]),
         ];
 

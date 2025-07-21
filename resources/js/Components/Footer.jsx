@@ -5,18 +5,18 @@ export default function Footer() {
     const { auth } = usePage().props;
     const isAdmin = auth.user?.role === 'admin';
 
-    // // Show minimal footer for admin pages
-    // if (isAdmin) {
-    //     return (
-    //         <footer className="bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700/50">
-    //             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-    //                 <div className="text-center text-sm text-slate-600 dark:text-slate-400">
-    //                     <p>&copy; {new Date().getFullYear()} HireInk. All rights reserved.</p>
-    //                 </div>
-    //             </div>
-    //         </footer>
-    //     );
-    // }
+    // Show minimal footer for admin pages
+    if (isAdmin) {
+        return (
+            <footer className="bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700/50">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                    <div className="text-center text-sm text-slate-600 dark:text-slate-400">
+                        <p>&copy; {new Date().getFullYear()} HireInk. All rights reserved.</p>
+                    </div>
+                </div>
+            </footer>
+        );
+    }
 
     // Regular footer for other pages
     return (
@@ -50,7 +50,7 @@ export default function Footer() {
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/categories" className="text-sm text-slate-600 hover:text-primary dark:text-slate-400 dark:hover:text-primary-400">
+                                <Link href="/job-categories" className="text-sm text-slate-600 hover:text-primary dark:text-slate-400 dark:hover:text-primary-400">
                                     Job Categories
                                 </Link>
                             </li>

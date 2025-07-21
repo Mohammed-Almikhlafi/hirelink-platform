@@ -10,8 +10,7 @@ export default function CategoryCard({ category }) {
 
   return (
       <Link
-          href={`/categories/${category.id}`}
-          // href={route('categories.show', category.id)}
+          href={route('job-categories.show', category.id)}
           className="group relative bg-white dark:bg-slate-800 rounded-xl p-6 
         hover:shadow-lg transition-all duration-200
         border border-slate-200 dark:border-slate-700/50
