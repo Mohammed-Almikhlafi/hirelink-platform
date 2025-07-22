@@ -94,6 +94,7 @@ class JobController extends Controller
         return Inertia::render('Jobs/Show', [
             'job'         => $job,
             'similarJobs' => $similarJobs,
+            'canApply'    => $canApply,
             'hasApplied'  => $hasApplied,
         ]);
     }
